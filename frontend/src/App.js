@@ -242,7 +242,7 @@ function App() {
     }
   };
 
-  const processInput = async () => {
+  const processInput = async (customText = null) => {
     setIsProcessing(true);
     setError(null);
     
@@ -263,12 +263,18 @@ function App() {
         // Handle text, code, or audio input
         let content;
         if (inputType === 'text') {
-          content = textInput;
+          content = customText || textInput; // Use custom text if provided
         } else if (inputType === 'code') {
           content = codeInput;
         } else if (inputType === 'audio' && uploadedFile) {
           // For audio, we'll send a placeholder since real speech-to-text would need additional setup
           content = "Audio file uploaded - please implement speech-to-text conversion";
+        }
+        
+        if (!content || content.trim() === '') {
+          setError('Please provide some content to process');
+          setIsProcessing(false);
+          return;
         }
         
         response = await axios.post(`${API}/process`, {
