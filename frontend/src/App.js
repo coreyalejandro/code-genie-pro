@@ -712,7 +712,7 @@ class LinkedList:
             {/* Process Button */}
             <div className="text-center">
               <button
-                onClick={processInput}
+                onClick={() => processInput()}
                 disabled={isProcessing || (!textInput && !codeInput && !uploadedFile)}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
