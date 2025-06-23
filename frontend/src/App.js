@@ -7,15 +7,6 @@ import './App.css';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Initialize Mermaid with better error handling
-mermaid.initialize({ 
-  startOnLoad: false,
-  theme: 'dark',
-  securityLevel: 'loose',
-  errorLevel: 'fatal',
-  logLevel: 'error'
-});
-
 const LANGUAGE_OPTIONS = [
   { key: 'python', name: 'Python', icon: '🐍' },
   { key: 'javascript', name: 'JavaScript', icon: '🟨' },
