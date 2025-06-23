@@ -799,21 +799,16 @@ class LinkedList:
                     </svg>
                     AI-generated flowchart logic - represents your algorithm's flow
                   </div>
-                  <a
-                    href="https://mermaid.live/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 font-medium hover:underline flex items-center cursor-pointer z-10 relative px-2 py-1 rounded hover:bg-blue-500/10 transition-all"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open('https://mermaid.live/', '_blank', 'noopener,noreferrer');
-                    }}
+                  <button
+                    onClick={() => window.open('https://mermaid.live/', '_blank')}
+                    className="text-blue-400 hover:text-blue-300 font-medium hover:underline flex items-center cursor-pointer px-3 py-2 rounded hover:bg-blue-500/20 transition-all border border-transparent hover:border-blue-500/30"
+                    type="button"
                   >
                     Edit in Mermaid Live
                     <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
