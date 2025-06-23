@@ -421,15 +421,78 @@ function App() {
 
               {inputType === 'code' && (
                 <div>
-                  <label className="block text-white font-medium mb-3">
-                    Paste your code:
-                  </label>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-white font-medium">
+                      Paste your code:
+                    </label>
+                    <button
+                      onClick={() => {
+                        const codeExamples = [
+                          `def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)`,
+                          `function quickSort(arr) {
+    if (arr.length <= 1) return arr;
+    const pivot = arr[arr.length - 1];
+    const left = [], right = [];
+    for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i] < pivot) left.push(arr[i]);
+        else right.push(arr[i]);
+    }
+    return [...quickSort(left), pivot, ...quickSort(right)];
+}`,
+                          `class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+    
+    def append(self, data):
+        new_node = Node(data)
+        if not self.head:
+            self.head = new_node
+            return
+        current = self.head
+        while current.next:
+            current = current.next
+        current.next = new_node`,
+                          `public class BinarySearch {
+    public static int binarySearch(int[] arr, int target) {
+        int left = 0, right = arr.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (arr[mid] == target) return mid;
+            if (arr[mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return -1;
+    }
+}`
+                        ];
+                        const randomCode = codeExamples[Math.floor(Math.random() * codeExamples.length)];
+                        setCodeInput(randomCode);
+                      }}
+                      className="text-blue-400 hover:text-blue-300 text-sm font-medium px-3 py-1 rounded-md hover:bg-blue-500/10 transition-all flex items-center"
+                    >
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                      Sample Code
+                    </button>
+                  </div>
                   <textarea
                     value={codeInput}
                     onChange={(e) => setCodeInput(e.target.value)}
-                    placeholder="Paste your code here..."
+                    placeholder="Paste your code here... (Click 'Sample Code' for examples)"
                     className="w-full h-32 bg-slate-700 text-white rounded-lg p-4 border border-slate-600 focus:border-blue-500 focus:outline-none resize-none font-mono text-sm"
                   />
+                  <div className="mt-2 text-xs text-slate-400">
+                    💡 Paste any code in any language - the AI will analyze and convert it
+                  </div>
                 </div>
               )}
 
