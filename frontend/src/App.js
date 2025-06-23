@@ -803,7 +803,11 @@ class LinkedList:
                     href="https://mermaid.live/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 font-medium underline-offset-2 hover:underline flex items-center"
+                    className="text-blue-400 hover:text-blue-300 font-medium hover:underline flex items-center cursor-pointer z-10 relative px-2 py-1 rounded hover:bg-blue-500/10 transition-all"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open('https://mermaid.live/', '_blank', 'noopener,noreferrer');
+                    }}
                   >
                     Edit in Mermaid Live
                     <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
