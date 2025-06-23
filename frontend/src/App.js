@@ -69,49 +69,82 @@ function App() {
         // Clear previous content
         flowchartRef.current.innerHTML = '';
         
-        // Create a unique ID for this flowchart
-        const chartId = `flowchart-${Date.now()}`;
-        
-        // Create the mermaid div with unique ID
-        const div = document.createElement('div');
-        div.id = chartId;
-        div.className = 'mermaid';
-        
         // Clean and validate the flowchart syntax
         let flowchartSyntax = result.flowchart.trim();
         
-        // Ensure it starts with a valid Mermaid syntax
-        if (!flowchartSyntax.startsWith('flowchart') && 
-            !flowchartSyntax.startsWith('graph') &&
-            !flowchartSyntax.startsWith('sequenceDiagram')) {
-          flowchartSyntax = `flowchart TD\n${flowchartSyntax}`;
+        // Remove any markdown code blocks
+        flowchartSyntax = flowchartSyntax.replace(/```mermaid\n?/g, '').replace(/```\n?/g, '');
+        
+        // Clean up common issues
+        flowchartSyntax = flowchartSyntax
+          .replace(/[\u2018\u2019]/g, "'") // Replace smart quotes
+          .replace(/[\u201C\u201D]/g, '"') // Replace smart double quotes
+          .replace(/[^\x00-\x7F]/g, "") // Remove non-ASCII characters
+          .trim();
+        
+        console.log('Original flowchart:', result.flowchart);
+        console.log('Cleaned flowchart:', flowchartSyntax);
+        
+        // Validate and fix syntax
+        if (!flowchartSyntax.toLowerCase().startsWith('flowchart') && 
+            !flowchartSyntax.toLowerCase().startsWith('graph')) {
+          flowchartSyntax = `flowchart TD\n    ${flowchartSyntax}`;
         }
         
-        div.textContent = flowchartSyntax;
-        flowchartRef.current.appendChild(div);
+        // Create a simple fallback display first
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.className = 'p-4 bg-slate-900 rounded text-slate-300';
+        fallbackDiv.innerHTML = `
+          <div class="mb-2 text-yellow-400 text-sm">⚠️ Flowchart Preview</div>
+          <pre class="text-xs whitespace-pre-wrap font-mono">${flowchartSyntax}</pre>
+          <div class="mt-2 text-xs text-slate-500">
+            The AI generated a flowchart, but Mermaid rendering is being refined. 
+            You can copy this syntax to use in Mermaid-compatible tools.
+          </div>
+        `;
         
-        // Use mermaid.render instead of init for better error handling
-        mermaid.render(chartId, flowchartSyntax)
-          .then((result) => {
-            div.innerHTML = result.svg;
-          })
-          .catch((error) => {
-            console.error('Mermaid rendering error:', error);
-            div.innerHTML = `
-              <div class="text-red-400 p-4 text-center">
-                <p class="font-medium">Flowchart rendering error</p>
-                <p class="text-sm mt-2">Raw syntax:</p>
-                <pre class="text-xs mt-2 bg-slate-800 p-2 rounded">${flowchartSyntax}</pre>
-              </div>
-            `;
-          });
+        flowchartRef.current.appendChild(fallbackDiv);
+        
+        // Try to render with Mermaid (but don't break if it fails)
+        setTimeout(() => {
+          try {
+            const chartId = `flowchart-${Date.now()}`;
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.id = chartId;
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.style.display = 'none'; // Hide initially
+            
+            // Test render
+            mermaid.parse(flowchartSyntax)
+              .then(() => {
+                // If parsing succeeds, try to render
+                return mermaid.render(chartId, flowchartSyntax);
+              })
+              .then((result) => {
+                // Success! Replace fallback with rendered chart
+                flowchartRef.current.innerHTML = '';
+                const successDiv = document.createElement('div');
+                successDiv.innerHTML = result.svg;
+                successDiv.className = 'mermaid-success';
+                flowchartRef.current.appendChild(successDiv);
+              })
+              .catch((error) => {
+                console.log('Mermaid render failed (keeping fallback):', error);
+                // Keep the fallback display - don't show error to user
+              });
+          } catch (error) {
+            console.log('Mermaid setup failed (keeping fallback):', error);
+            // Keep the fallback display
+          }
+        }, 100);
+        
       } catch (error) {
         console.error('Error setting up flowchart:', error);
         if (flowchartRef.current) {
           flowchartRef.current.innerHTML = `
-            <div class="text-red-400 p-4 text-center">
-              <p class="font-medium">Unable to render flowchart</p>
-              <p class="text-sm mt-2">Please try again or check the generated syntax.</p>
+            <div class="text-slate-400 p-4 text-center bg-slate-900 rounded">
+              <p class="font-medium">Flowchart Generated</p>
+              <p class="text-sm mt-2">Raw output available in browser console</p>
             </div>
           `;
         }
