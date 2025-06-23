@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Mic, Code, FileText, Image, Play, Copy, Download, Loader2, AlertCircle } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import mermaid from 'mermaid';
 import axios from 'axios';
 import './App.css';
 
