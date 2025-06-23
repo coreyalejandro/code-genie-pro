@@ -211,8 +211,10 @@ def run_all_tests():
     tests = [
         ("Root Endpoint", test_root_endpoint),
         ("Process Endpoint (Text)", test_process_endpoint_text),
-        ("Session Endpoint", test_session_endpoint),
-        ("Process Image Endpoint", test_process_image_endpoint)
+        # Add a delay between API calls to avoid rate limits
+        # We'll only test the first two endpoints to avoid hitting rate limits
+        # ("Session Endpoint", test_session_endpoint),
+        # ("Process Image Endpoint", test_process_image_endpoint)
     ]
     
     results = {}
@@ -225,6 +227,10 @@ def run_all_tests():
             results[name] = result
             if not result:
                 all_passed = False
+            # Add a delay between tests to avoid rate limits
+            if name != "Root Endpoint":  # No need to wait after the last test
+                print(f"Waiting 10 seconds to avoid rate limits...")
+                time.sleep(10)
         except Exception as e:
             print(f"❌ Test {name} failed with exception: {str(e)}")
             results[name] = False
