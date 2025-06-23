@@ -64,14 +64,55 @@ function App() {
   useEffect(() => {
     if (result && result.flowchart && flowchartRef.current) {
       try {
+        // Clear previous content
         flowchartRef.current.innerHTML = '';
+        
+        // Create a unique ID for this flowchart
+        const chartId = `flowchart-${Date.now()}`;
+        
+        // Create the mermaid div with unique ID
         const div = document.createElement('div');
+        div.id = chartId;
         div.className = 'mermaid';
-        div.textContent = result.flowchart;
+        
+        // Clean and validate the flowchart syntax
+        let flowchartSyntax = result.flowchart.trim();
+        
+        // Ensure it starts with a valid Mermaid syntax
+        if (!flowchartSyntax.startsWith('flowchart') && 
+            !flowchartSyntax.startsWith('graph') &&
+            !flowchartSyntax.startsWith('sequenceDiagram')) {
+          flowchartSyntax = `flowchart TD\n${flowchartSyntax}`;
+        }
+        
+        div.textContent = flowchartSyntax;
         flowchartRef.current.appendChild(div);
-        mermaid.init(undefined, div);
+        
+        // Use mermaid.render instead of init for better error handling
+        mermaid.render(chartId, flowchartSyntax)
+          .then((result) => {
+            div.innerHTML = result.svg;
+          })
+          .catch((error) => {
+            console.error('Mermaid rendering error:', error);
+            div.innerHTML = `
+              <div class="text-red-400 p-4 text-center">
+                <p class="font-medium">Flowchart rendering error</p>
+                <p class="text-sm mt-2">Raw syntax:</p>
+                <pre class="text-xs mt-2 bg-slate-800 p-2 rounded">${flowchartSyntax}</pre>
+              </div>
+            `;
+          });
       } catch (error) {
-        console.error('Error rendering flowchart:', error);
+        console.error('Error setting up flowchart:', error);
+        if (flowchartRef.current) {
+          flowchartRef.current.innerHTML = `
+            <div class="text-red-400 p-4 text-center">
+              <p class="font-medium">Unable to render flowchart</p>
+              <p class="text-sm mt-2">Please try again or check the generated syntax.</p>
+            </div>
+          `;
+        }
       }
     }
   }, [result]);
