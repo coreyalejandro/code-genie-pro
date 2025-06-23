@@ -20,6 +20,91 @@ const LANGUAGE_OPTIONS = [
   { key: 'kotlin', name: 'Kotlin', icon: '🟣' }
 ];
 
+// Dynamic examples that rotate
+const EXAMPLE_PROMPTS = [
+  {
+    category: "Sorting Algorithms",
+    examples: [
+      "Create a function that sorts an array using bubble sort algorithm",
+      "Implement quicksort algorithm to sort numbers in ascending order",
+      "Build a merge sort function that divides and conquers an array",
+      "Design an insertion sort algorithm for small datasets",
+      "Create a heap sort implementation for efficient sorting"
+    ]
+  },
+  {
+    category: "Search Algorithms", 
+    examples: [
+      "Implement binary search to find an element in a sorted array",
+      "Create a linear search function to find a value in an unsorted list",
+      "Build a depth-first search algorithm for tree traversal",
+      "Design breadth-first search for finding shortest path in a graph",
+      "Implement hash table search with collision handling"
+    ]
+  },
+  {
+    category: "Data Structures",
+    examples: [
+      "Create a stack data structure with push, pop, and peek operations",
+      "Implement a queue with enqueue and dequeue functionality",
+      "Build a binary tree with insert, delete, and search methods",
+      "Design a linked list with add, remove, and traverse operations",
+      "Create a hash map with dynamic resizing capabilities"
+    ]
+  },
+  {
+    category: "Mathematical Algorithms",
+    examples: [
+      "Calculate factorial of a number using recursion and iteration",
+      "Generate Fibonacci sequence up to n terms using dynamic programming",
+      "Find the greatest common divisor (GCD) using Euclidean algorithm",
+      "Implement prime number checker using sieve of Eratosthenes",
+      "Create a function to calculate power of a number efficiently"
+    ]
+  },
+  {
+    category: "String Processing",
+    examples: [
+      "Check if a string is a palindrome ignoring case and spaces",
+      "Find all anagrams of a word in a list of strings",
+      "Implement string pattern matching using KMP algorithm",
+      "Create a function to reverse words in a sentence",
+      "Build a text compression algorithm using character frequency"
+    ]
+  },
+  {
+    category: "Web Development",
+    examples: [
+      "Create a REST API endpoint that handles user authentication",
+      "Build a responsive navigation menu with dropdown functionality",
+      "Implement form validation with error handling and user feedback",
+      "Design a shopping cart system with add, remove, and total calculation",
+      "Create a real-time chat application with WebSocket connections"
+    ]
+  },
+  {
+    category: "Game Development",
+    examples: [
+      "Create a tic-tac-toe game with win condition checking",
+      "Implement a rock-paper-scissors game with score tracking",
+      "Build a number guessing game with hints and attempts counter",
+      "Design a simple 2D collision detection system",
+      "Create a maze generator using recursive backtracking"
+    ]
+  }
+];
+
+// Function to get a random example
+const getRandomExample = () => {
+  const allExamples = EXAMPLE_PROMPTS.flatMap(category => 
+    category.examples.map(example => ({
+      text: example,
+      category: category.category
+    }))
+  );
+  return allExamples[Math.floor(Math.random() * allExamples.length)];
+};
+
 function App() {
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const [activeTab, setActiveTab] = useState('input');
