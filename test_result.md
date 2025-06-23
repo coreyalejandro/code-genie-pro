@@ -180,15 +180,15 @@ frontend:
 
   - task: "AI Results Display"
     implemented: true
-    working: "NA"
+    working: false
     file: "App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
-        -working: "NA"
-        -agent: "main"
-        -comment: "Implemented results tab with pseudocode, Mermaid flowchart rendering, and code display with language selection. Added copy/download functionality. Need to test results display and Mermaid integration."
+        -working: false
+        -agent: "user"
+        -comment: "User reported error in flowchart rendering: 'Uncaught runtime errors: ERROR [object Object]' - Mermaid.js integration has issues with DOM manipulation and error handling. Need to fix flowchart rendering."
 
   - task: "Modern UI Design"
     implemented: true
