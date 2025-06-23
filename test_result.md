@@ -210,9 +210,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Google Gemini Integration Setup"
-    - "Multimodal Input Processing"
-    - "AI Processing Pipeline"
+    - "Multimodal Input Interface"
+    - "AI Results Display"
+    - "Modern UI Design"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
