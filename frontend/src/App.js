@@ -765,11 +765,52 @@ class LinkedList:
 
               {/* Flowchart */}
               <div className="bg-slate-800 rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Flowchart</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-white">Flowchart</h3>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => copyToClipboard(result.flowchart)}
+                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-all"
+                      title="Copy flowchart syntax"
+                    >
+                      <Copy className="w-5 h-5" />
+                    </button>
+                    <a
+                      href="https://mermaid.live/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 text-slate-400 hover:text-blue-400 hover:bg-slate-700 rounded transition-all"
+                      title="Open in Mermaid Live Editor"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
                 <div 
                   ref={flowchartRef}
                   className="bg-slate-900 p-4 rounded-lg overflow-auto min-h-[300px] flex items-center justify-center"
                 />
+                <div className="mt-3 text-xs text-slate-400 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    AI-generated flowchart logic - represents your algorithm's flow
+                  </div>
+                  <a
+                    href="https://mermaid.live/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 font-medium underline-offset-2 hover:underline flex items-center"
+                  >
+                    Edit in Mermaid Live
+                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
               </div>
             </div>
 
