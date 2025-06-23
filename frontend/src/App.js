@@ -290,7 +290,75 @@ function App() {
   };
 
   const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
+    // Try modern Clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          showCopyFeedback('✅ Copied to clipboard!');
+        })
+        .catch(() => {
+          // Fallback to legacy method
+          fallbackCopyToClipboard(text);
+        });
+    } else {
+      // Use fallback method
+      fallbackCopyToClipboard(text);
+    }
+  };
+
+  const fallbackCopyToClipboard = (text) => {
+    try {
+      // Create a temporary textarea element
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      // Try to copy using execCommand
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        showCopyFeedback('✅ Copied to clipboard!');
+      } else {
+        showCopyFeedback('❌ Copy failed - please select and copy manually');
+      }
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+      showCopyFeedback('❌ Copy not supported - please select and copy manually');
+    }
+  };
+
+  const showCopyFeedback = (message) => {
+    // Create temporary feedback element
+    const feedback = document.createElement('div');
+    feedback.textContent = message;
+    feedback.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #1e293b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 10000;
+      font-size: 14px;
+      border: 1px solid #334155;
+    `;
+    
+    document.body.appendChild(feedback);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      if (feedback.parentNode) {
+        feedback.parentNode.removeChild(feedback);
+      }
+    }, 3000);
   };
 
   const downloadCode = (code, language) => {
