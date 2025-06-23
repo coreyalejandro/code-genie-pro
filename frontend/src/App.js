@@ -484,10 +484,8 @@ function App() {
                       <button
                         onClick={() => {
                           setTextInput(currentExample.text);
-                          // Small delay to ensure state is updated, then process
-                          setTimeout(() => {
-                            processInput();
-                          }, 100);
+                          // Pass the example text directly to processInput
+                          processInput(currentExample.text);
                         }}
                         disabled={isProcessing}
                         className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all flex items-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
