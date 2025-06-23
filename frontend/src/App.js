@@ -118,10 +118,16 @@ function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [uploadedFile, setUploadedFile] = useState(null);
   const [imageDescription, setImageDescription] = useState('');
+  const [currentExample, setCurrentExample] = useState(() => getRandomExample());
   
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const flowchartRef = useRef(null);
+
+  // Get a new random example
+  const getNewExample = () => {
+    setCurrentExample(getRandomExample());
+  };
 
   // Audio recording setup
   useEffect(() => {
