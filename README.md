@@ -1,6 +1,8 @@
-# 🤖 AI Multimodal Coding Assistant
+# 🧞‍♂️ Code Genie
 
-**Transform any input into pseudocode, flowcharts, and code in 10 programming languages using Google Gemini AI**
+![Code Genie Homepage](./screenshot.png)
+
+**Your AI-powered multimodal coding assistant that transforms any input into pseudocode, flowcharts, and code in 10 programming languages using Google Gemini AI**
 
 ---
 
