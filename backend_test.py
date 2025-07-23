@@ -8,7 +8,7 @@ import sys
 from pprint import pprint
 
 # Get the backend URL from the frontend .env file
-BACKEND_URL = "https://e79fdd8c-1171-4610-b637-79ed2a2a4cf1.preview.emergentagent.com"
+BACKEND_URL = "https://a93f2212-32d7-4de9-8dc5-71f34c2efc0c.preview.emergentagent.com"
 API_URL = f"{BACKEND_URL}/api"
 
 # Test session ID
