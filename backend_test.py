@@ -38,7 +38,7 @@ def test_process_endpoint_text():
         payload = {
             "session_id": TEST_SESSION_ID,
             "input_type": "text",
-            "content": "Create a function to find the maximum number in an array"
+            "content": "sort an array using bubble sort"
         }
         
         print(f"Sending request to {API_URL}/process with payload:")
