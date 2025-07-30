@@ -98,6 +98,61 @@ def test_process_endpoint_text():
         for lang in expected_languages:
             print(f"- {lang}: ✅")
         
+        # NEW: Validate code_analysis field (AI Code Analysis feature)
+        assert "code_analysis" in result, "Response should contain 'code_analysis' field"
+        code_analysis = result["code_analysis"]
+        
+        # Validate code_analysis structure
+        assert "time_complexity" in code_analysis, "Code analysis should contain 'time_complexity' field"
+        assert "space_complexity" in code_analysis, "Code analysis should contain 'space_complexity' field"
+        assert "quality_score" in code_analysis, "Code analysis should contain 'quality_score' field"
+        assert "optimizations" in code_analysis, "Code analysis should contain 'optimizations' field"
+        assert "alternatives" in code_analysis, "Code analysis should contain 'alternatives' field"
+        assert "learning_insights" in code_analysis, "Code analysis should contain 'learning_insights' field"
+        
+        # Validate time_complexity format (should be O(...) format)
+        time_complexity = code_analysis["time_complexity"]
+        assert isinstance(time_complexity, str), "Time complexity should be a string"
+        assert len(time_complexity) > 0, "Time complexity should not be empty"
+        print(f"\nTime Complexity: {time_complexity}")
+        
+        # Validate space_complexity format (should be O(...) format)
+        space_complexity = code_analysis["space_complexity"]
+        assert isinstance(space_complexity, str), "Space complexity should be a string"
+        assert len(space_complexity) > 0, "Space complexity should not be empty"
+        print(f"Space Complexity: {space_complexity}")
+        
+        # Validate quality_score (should be 1-10)
+        quality_score = code_analysis["quality_score"]
+        assert isinstance(quality_score, (int, float)), "Quality score should be a number"
+        assert 1 <= quality_score <= 10, f"Quality score should be between 1-10, got {quality_score}"
+        print(f"Quality Score: {quality_score}/10")
+        
+        # Validate optimizations (should be array of suggestions)
+        optimizations = code_analysis["optimizations"]
+        assert isinstance(optimizations, list), "Optimizations should be a list"
+        assert len(optimizations) > 0, "Optimizations should not be empty"
+        print(f"\nOptimizations ({len(optimizations)} suggestions):")
+        for i, opt in enumerate(optimizations[:3], 1):  # Show first 3
+            print(f"  {i}. {opt}")
+        
+        # Validate alternatives (should be array of alternative approaches)
+        alternatives = code_analysis["alternatives"]
+        assert isinstance(alternatives, list), "Alternatives should be a list"
+        assert len(alternatives) > 0, "Alternatives should not be empty"
+        print(f"\nAlternatives ({len(alternatives)} approaches):")
+        for i, alt in enumerate(alternatives[:2], 1):  # Show first 2
+            print(f"  {i}. {alt}")
+        
+        # Validate learning_insights (should be array of learning tips)
+        learning_insights = code_analysis["learning_insights"]
+        assert isinstance(learning_insights, list), "Learning insights should be a list"
+        assert len(learning_insights) > 0, "Learning insights should not be empty"
+        print(f"\nLearning Insights ({len(learning_insights)} tips):")
+        for i, insight in enumerate(learning_insights[:2], 1):  # Show first 2
+            print(f"  {i}. {insight}")
+        
+        print("\n✅ AI Code Analysis feature validation passed")
         print("\n✅ Process endpoint test with text input passed")
         return True
     except Exception as e:
