@@ -132,6 +132,67 @@ async def process_with_gemini(session_id: str, content: str, input_type: str, de
         logging.error(f"Error processing with Gemini: {str(e)}")
         raise HTTPException(status_code=500, detail=f"AI processing failed: {str(e)}")
 
+async def analyze_code_with_ai(session_id: str, pseudocode: str, code_outputs: dict):
+    """Analyze code for complexity, optimization opportunities, and quality"""
+    try:
+        chat = await get_gemini_chat(session_id)
+        
+        # Analyze the Python version (as representative)
+        python_code = code_outputs.get('python', '')
+        
+        analysis_prompt = f"""Analyze this code and provide:
+1. Time complexity (Big O notation)
+2. Space complexity (Big O notation)  
+3. Code quality score (1-10)
+4. 3 specific optimization suggestions
+5. 2 alternative approaches
+6. Learning insights for beginners
+
+Pseudocode:
+{pseudocode}
+
+Python Code:
+{python_code}
+
+Format response as JSON:
+{{
+  "time_complexity": "O(...)",
+  "space_complexity": "O(...)",
+  "quality_score": 8,
+  "optimizations": ["suggestion 1", "suggestion 2", "suggestion 3"],
+  "alternatives": ["approach 1", "approach 2"],
+  "learning_insights": ["insight 1", "insight 2"]
+}}"""
+
+        analysis_message = UserMessage(text=analysis_prompt)
+        response = await chat.send_message(analysis_message)
+        
+        # Parse JSON response
+        import json
+        try:
+            return json.loads(response)
+        except:
+            # Fallback if JSON parsing fails
+            return {
+                "time_complexity": "Analysis pending",
+                "space_complexity": "Analysis pending", 
+                "quality_score": 7,
+                "optimizations": ["Use more efficient algorithms", "Optimize memory usage", "Add error handling"],
+                "alternatives": ["Iterative approach", "Dynamic programming approach"],
+                "learning_insights": ["Understanding complexity is key", "Consider edge cases"]
+            }
+            
+    except Exception as e:
+        logging.error(f"Error analyzing code: {str(e)}")
+        return {
+            "time_complexity": "Analysis failed",
+            "space_complexity": "Analysis failed",
+            "quality_score": 5,
+            "optimizations": ["Analysis temporarily unavailable"],
+            "alternatives": ["Analysis temporarily unavailable"], 
+            "learning_insights": ["Analysis temporarily unavailable"]
+        }
+
 @api_router.post("/process", response_model=ProcessingResult)
 async def process_input(request: ProcessingRequest):
     """Process multimodal input and generate pseudocode, flowchart, and code"""
