@@ -43,6 +43,7 @@ class ProcessingResult(BaseModel):
     pseudocode: str
     flowchart: str
     code_outputs: dict
+    code_analysis: dict = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class SessionHistory(BaseModel):
