@@ -205,13 +205,21 @@ async def process_input(request: ProcessingRequest):
             request.description
         )
         
+        # Analyze code quality and complexity
+        code_analysis = await analyze_code_with_ai(
+            request.session_id,
+            result["pseudocode"], 
+            result["code_outputs"]
+        )
+        
         # Create result object
         processing_result = ProcessingResult(
             session_id=request.session_id,
             input_type=request.input_type,
             pseudocode=result["pseudocode"],
             flowchart=result["flowchart"],
-            code_outputs=result["code_outputs"]
+            code_outputs=result["code_outputs"],
+            code_analysis=code_analysis
         )
         
         # Save to database
