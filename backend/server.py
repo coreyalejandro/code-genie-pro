@@ -259,7 +259,54 @@ async def process_image(
         logging.error(f"Error processing image: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/session/{session_id}", response_model=SessionHistory)
+@api_router.post("/analyze-code")
+async def analyze_code_only(request: ProcessingRequest):
+    """Analyze existing code for complexity, optimization, and learning insights"""
+    try:
+        # Get analysis directly without full processing
+        code_analysis = await analyze_code_with_ai(
+            request.session_id,
+            "", # No pseudocode for direct analysis
+            {"python": request.content} # Use input as code
+        )
+        
+        # Return analysis-only result
+        return {
+            "session_id": request.session_id,
+            "input_type": "code_analysis",
+            "code_analysis": code_analysis,
+            "original_code": request.content
+        }
+        
+    except Exception as e:
+        logging.error(f"Error analyzing code: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/analyze-code-file")
+async def analyze_code_file(
+    file: UploadFile = File(...),
+    session_id: str = Form(...)
+):
+    """Analyze uploaded code file"""
+    try:
+        # Read file content
+        content = await file.read()
+        code_content = content.decode('utf-8')
+        
+        # Create analysis request
+        request = ProcessingRequest(
+            session_id=session_id,
+            input_type="code_analysis",
+            content=code_content
+        )
+        
+        # Analyze the code
+        result = await analyze_code_only(request)
+        return result
+        
+    except Exception as e:
+        logging.error(f"Error analyzing code file: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 async def get_session_history(session_id: str):
     """Get processing history for a session"""
     try:
