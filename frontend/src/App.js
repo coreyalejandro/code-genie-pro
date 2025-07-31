@@ -1304,6 +1304,9 @@ class LinkedList:
                 </pre>
               </div>
             </div>
+            </div>
+          </div>
+        )}
         </div>
       </div>
       
