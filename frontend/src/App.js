@@ -488,10 +488,15 @@ function App() {
             {/* Input Type Selection */}
             <div className="bg-slate-800 rounded-lg p-6 mb-6">
               <h3 className="text-xl font-semibold text-white mb-4">Choose Input Type</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
                   { type: 'text', icon: FileText, label: 'Text Description' },
                   { type: 'code', icon: Code, label: 'Code Snippet' },
+                  { type: 'code_analysis', icon: () => (
+                    <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  ), label: 'Code Analysis' },
                   { type: 'image', icon: Image, label: 'Image/Diagram' },
                   { type: 'audio', icon: Mic, label: 'Voice/Audio' }
                 ].map(({ type, icon: Icon, label }) => (
@@ -500,7 +505,9 @@ function App() {
                     onClick={() => setInputType(type)}
                     className={`p-4 rounded-lg border-2 transition-all ${
                       inputType === type
-                        ? 'border-blue-500 bg-blue-500/10 text-blue-400'
+                        ? type === 'code_analysis' 
+                          ? 'border-purple-500 bg-purple-500/10 text-purple-400'
+                          : 'border-blue-500 bg-blue-500/10 text-blue-400'
                         : 'border-slate-600 hover:border-slate-500 text-slate-300'
                     }`}
                   >
