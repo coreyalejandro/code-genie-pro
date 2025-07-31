@@ -328,14 +328,14 @@ async def get_session_history(session_id: str):
 @api_router.post("/chat")
 async def chat_about_code(request: dict):
     """Interactive chat about code analysis or results"""
+    session_id = request.get('session_id')
+    message = request.get('message')
+    context = request.get('context', {})  # Contains code, analysis, etc.
+    
+    if not session_id or not message:
+        raise HTTPException(status_code=400, detail="Session ID and message are required")
+    
     try:
-        session_id = request.get('session_id')
-        message = request.get('message')
-        context = request.get('context', {})  # Contains code, analysis, etc.
-        
-        if not session_id or not message:
-            raise HTTPException(status_code=400, detail="Session ID and message are required")
-        
         chat = await get_gemini_chat(session_id)
         
         # Build context-aware prompt
