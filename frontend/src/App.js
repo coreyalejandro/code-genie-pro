@@ -111,9 +111,11 @@ function App() {
   const [inputType, setInputType] = useState('text');
   const [textInput, setTextInput] = useState('');
   const [codeInput, setCodeInput] = useState('');
+  const [codeAnalysisInput, setCodeAnalysisInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState(null);
+  const [analysisResult, setAnalysisResult] = useState(null);
   const [error, setError] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [uploadedFile, setUploadedFile] = useState(null);
