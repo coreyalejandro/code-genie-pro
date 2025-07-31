@@ -680,6 +680,99 @@ class LinkedList:
                 </div>
               )}
 
+              {inputType === 'code_analysis' && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-white font-medium">
+                      Analyze your code:
+                    </label>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          const analysisExamples = [
+                            `def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr`,
+                            `function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n-1) + fibonacci(n-2);
+}`,
+                            `public class LinearSearch {
+    public static int linearSearch(int[] arr, int target) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == target) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}`
+                          ];
+                          const randomCode = analysisExamples[Math.floor(Math.random() * analysisExamples.length)];
+                          setCodeAnalysisInput(randomCode);
+                        }}
+                        className="text-purple-400 hover:text-purple-300 text-sm font-medium px-3 py-1 rounded-md hover:bg-purple-500/10 transition-all flex items-center"
+                      >
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                        Sample Code
+                      </button>
+                      <div
+                        {...getRootProps()}
+                        className="text-purple-400 hover:text-purple-300 text-sm font-medium px-3 py-1 rounded-md hover:bg-purple-500/10 transition-all flex items-center cursor-pointer"
+                      >
+                        <input {...getInputProps()} />
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        Upload File
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
+                    <div className="flex items-center text-purple-400 text-sm font-medium mb-2">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                      AI Code Analysis
+                    </div>
+                    <ul className="text-purple-200 text-sm space-y-1">
+                      <li>• Time & Space complexity analysis</li>
+                      <li>• Code quality scoring</li>
+                      <li>• Optimization suggestions</li>
+                      <li>• Alternative approaches</li>
+                      <li>• Learning insights for improvement</li>
+                    </ul>
+                  </div>
+                  
+                  {uploadedFile && uploadedFile.type === 'text/plain' ? (
+                    <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                      <div className="text-green-400 text-sm font-medium">File uploaded: {uploadedFile.name}</div>
+                    </div>
+                  ) : (
+                    <textarea
+                      value={codeAnalysisInput}
+                      onChange={(e) => setCodeAnalysisInput(e.target.value)}
+                      placeholder="Paste your code here for instant AI analysis..."
+                      className="w-full h-40 bg-slate-700 text-white rounded-lg p-4 border border-slate-600 focus:border-purple-500 focus:outline-none resize-none font-mono text-sm"
+                    />
+                  )}
+                  
+                  <div className="mt-2 text-xs text-slate-400 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    💡 Get instant AI analysis of your code - complexity, quality, and optimization tips
+                  </div>
+                </div>
+              )}
+
               {inputType === 'image' && (
                 <div>
                   <label className="block text-white font-medium mb-3">
