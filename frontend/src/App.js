@@ -406,6 +406,63 @@ function App() {
     }, 3000);
   };
 
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || isChatting) return;
+    
+    setIsChatting(true);
+    const userMessage = chatInput.trim();
+    setChatInput('');
+    
+    // Add user message to history
+    const newUserMessage = {
+      type: 'user',
+      message: userMessage,
+      timestamp: new Date().toISOString()
+    };
+    setChatHistory(prev => [...prev, newUserMessage]);
+    
+    try {
+      // Build context based on current tab
+      let context = {};
+      if (activeTab === 'results' && result) {
+        context = {
+          code: result.code_outputs[selectedLanguage],
+          analysis: result.code_analysis
+        };
+      } else if (activeTab === 'analysis' && analysisResult) {
+        context = {
+          code: analysisResult.original_code,
+          analysis: analysisResult.code_analysis
+        };
+      }
+      
+      const response = await axios.post(`${API}/chat`, {
+        session_id: sessionId,
+        message: userMessage,
+        context: context
+      });
+      
+      // Add AI response to history
+      const aiMessage = {
+        type: 'ai',
+        message: response.data.response,
+        timestamp: response.data.timestamp
+      };
+      setChatHistory(prev => [...prev, aiMessage]);
+      
+    } catch (err) {
+      console.error('Chat error:', err);
+      const errorMessage = {
+        type: 'error',
+        message: 'Sorry, I had trouble responding. Please try again.',
+        timestamp: new Date().toISOString()
+      };
+      setChatHistory(prev => [...prev, errorMessage]);
+    } finally {
+      setIsChatting(false);
+    }
+  };
+
   const downloadCode = (code, language) => {
     const extensions = {
       python: 'py', javascript: 'js', java: 'java', cpp: 'cpp',
