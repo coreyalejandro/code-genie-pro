@@ -122,6 +122,12 @@ function App() {
   const [imageDescription, setImageDescription] = useState('');
   const [currentExample, setCurrentExample] = useState(() => getRandomExample());
   
+  // Chat functionality
+  const [chatHistory, setChatHistory] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatting, setIsChatting] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const flowchartRef = useRef(null);
