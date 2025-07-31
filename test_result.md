@@ -241,6 +241,21 @@ test_plan:
         -agent: "testing"
         -comment: "Tested the new AI code analysis feature. The /api/process endpoint now correctly includes the code_analysis field with all required components: time_complexity, space_complexity, quality_score (1-10), optimizations array, alternatives array, and learning_insights array. The API structure matches the updated ProcessingResult model. The fallback mechanism works correctly when AI analysis fails, ensuring the API always returns a valid response. Feature is working as designed."
 
+  - task: "Dedicated Code Analysis Endpoint"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "Added dedicated /api/analyze-code endpoint for instant code analysis without full processing pipeline. Returns only code_analysis, session_id, input_type, and original_code fields."
+        -working: true
+        -agent: "testing"
+        -comment: "Successfully tested the new /api/analyze-code endpoint with the specified test data (bubble sort algorithm). The endpoint correctly returns a different response format from the full /api/process endpoint: Contains session_id, input_type ('code_analysis'), code_analysis object with all required fields (time_complexity, space_complexity, quality_score, optimizations, alternatives, learning_insights), and original_code field. Confirmed it does NOT contain pseudocode, flowchart, or code_outputs fields, making it distinct from the full processing pipeline. The endpoint provides instant code analysis as designed."
+
   - task: "Interactive Chat Interface"
     implemented: false
     working: "NA"
