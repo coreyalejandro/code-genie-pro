@@ -534,9 +534,11 @@ def run_all_tests():
     tests = [
         ("Root Endpoint", test_root_endpoint),
         ("Process Endpoint (Text)", test_process_endpoint_text),
-        ("Analyze Code Endpoint", test_analyze_code_endpoint),  # New test for code analysis
+        ("Analyze Code Endpoint", test_analyze_code_endpoint),
+        ("Chat Endpoint", test_chat_endpoint),  # New test for chat functionality
+        ("Chat Endpoint Error Handling", test_chat_endpoint_error_handling),  # New test for error handling
         # Add a delay between API calls to avoid rate limits
-        # We'll only test the first three endpoints to avoid hitting rate limits
+        # We'll only test the first five endpoints to avoid hitting rate limits
         # ("Session Endpoint", test_session_endpoint),
         # ("Process Image Endpoint", test_process_image_endpoint)
     ]
@@ -552,7 +554,7 @@ def run_all_tests():
             if not result:
                 all_passed = False
             # Add a delay between tests to avoid rate limits
-            if name != "Analyze Code Endpoint":  # No need to wait after the last test
+            if name != "Chat Endpoint Error Handling":  # No need to wait after the last test
                 print(f"Waiting 10 seconds to avoid rate limits...")
                 time.sleep(10)
         except Exception as e:
