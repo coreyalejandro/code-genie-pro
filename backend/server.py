@@ -325,6 +325,51 @@ async def get_session_history(session_id: str):
         logging.error(f"Error getting session history: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/chat")
+async def chat_about_code(request: dict):
+    """Interactive chat about code analysis or results"""
+    try:
+        session_id = request.get('session_id')
+        message = request.get('message')
+        context = request.get('context', {})  # Contains code, analysis, etc.
+        
+        if not session_id or not message:
+            raise HTTPException(status_code=400, detail="Session ID and message are required")
+        
+        chat = await get_gemini_chat(session_id)
+        
+        # Build context-aware prompt
+        context_prompt = ""
+        if context.get('code'):
+            context_prompt += f"Code being discussed:\n{context['code']}\n\n"
+        if context.get('analysis'):
+            analysis = context['analysis']
+            context_prompt += f"Previous Analysis:\n"
+            context_prompt += f"- Time Complexity: {analysis.get('time_complexity', 'N/A')}\n"
+            context_prompt += f"- Space Complexity: {analysis.get('space_complexity', 'N/A')}\n"
+            context_prompt += f"- Quality Score: {analysis.get('quality_score', 'N/A')}/10\n\n"
+        
+        # Create conversational prompt
+        full_prompt = f"""You are an expert programming tutor having a conversation about code. 
+        
+{context_prompt}User question: {message}
+
+Provide a helpful, conversational response. Be specific about the code when relevant. Keep responses concise but informative."""
+
+        chat_message = UserMessage(text=full_prompt)
+        response = await chat.send_message(chat_message)
+        
+        return {
+            "session_id": session_id,
+            "message": message,
+            "response": response,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logging.error(f"Error in chat: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/")
 async def root():
     return {"message": "AI Multimodal Coding Assistant API"}
