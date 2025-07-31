@@ -266,7 +266,7 @@ test_plan:
     status_history:
         -working: "NA"
         -agent: "main"
-        -comment: "Conversational sidebar for follow-up questions and line-by-line explanations"
+        -comment: "Starting Phase 2: Adding conversational sidebar for follow-up questions, line-by-line explanations, and interactive discussions about code results and analysis."
 
   - task: "Dedicated Code Analysis Frontend Interface"
     implemented: true
