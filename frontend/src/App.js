@@ -870,18 +870,33 @@ class LinkedList:
             <div className="text-center">
               <button
                 onClick={() => processInput()}
-                disabled={isProcessing || (!textInput && !codeInput && !uploadedFile)}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isProcessing || (!textInput && !codeInput && !codeAnalysisInput && !uploadedFile)}
+                className={`px-8 py-4 text-white font-semibold rounded-lg shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  inputType === 'code_analysis' 
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                }`}
               >
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-5 h-5 inline mr-2 animate-spin" />
-                    Processing with AI...
+                    {inputType === 'code_analysis' ? 'Analyzing Code...' : 'Processing with AI...'}
                   </>
                 ) : (
                   <>
-                    <Play className="w-5 h-5 inline mr-2" />
-                    Transform with AI
+                    {inputType === 'code_analysis' ? (
+                      <>
+                        <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        Analyze Code
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-5 h-5 inline mr-2" />
+                        Transform with AI
+                      </>
+                    )}
                   </>
                 )}
               </button>
