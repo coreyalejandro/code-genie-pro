@@ -221,10 +221,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Multimodal Input Interface"
-    - "AI Results Display"
-    - "Modern UI Design"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
