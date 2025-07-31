@@ -251,7 +251,35 @@ function App() {
     try {
       let response;
       
-      if (inputType === 'image' && uploadedFile) {
+      if (inputType === 'code_analysis') {
+        // Handle code analysis only
+        if (uploadedFile && uploadedFile.type === 'text/plain') {
+          const formData = new FormData();
+          formData.append('file', uploadedFile);
+          formData.append('session_id', sessionId);
+          
+          response = await axios.post(`${API}/analyze-code-file`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        } else {
+          const content = codeAnalysisInput;
+          if (!content || content.trim() === '') {
+            setError('Please provide code to analyze');
+            setIsProcessing(false);
+            return;
+          }
+          
+          response = await axios.post(`${API}/analyze-code`, {
+            session_id: sessionId,
+            input_type: 'code_analysis',
+            content: content
+          });
+        }
+        
+        setAnalysisResult(response.data);
+        setActiveTab('analysis');
+        
+      } else if (inputType === 'image' && uploadedFile) {
         // Handle image upload
         const formData = new FormData();
         formData.append('file', uploadedFile);
@@ -261,15 +289,17 @@ function App() {
         response = await axios.post(`${API}/process-image`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
+        
+        setResult(response.data);
+        setActiveTab('results');
       } else {
-        // Handle text, code, or audio input
+        // Handle text, code, or audio input (original flow)
         let content;
         if (inputType === 'text') {
-          content = customText || textInput; // Use custom text if provided
+          content = customText || textInput;
         } else if (inputType === 'code') {
           content = codeInput;
         } else if (inputType === 'audio' && uploadedFile) {
-          // For audio, we'll send a placeholder since real speech-to-text would need additional setup
           content = "Audio file uploaded - please implement speech-to-text conversion";
         }
         
@@ -285,10 +315,11 @@ function App() {
           content: content,
           description: inputType === 'image' ? imageDescription : null
         });
+        
+        setResult(response.data);
+        setActiveTab('results');
       }
       
-      setResult(response.data);
-      setActiveTab('results');
     } catch (err) {
       console.error('Processing error:', err);
       setError(err.response?.data?.detail || 'An error occurred while processing your input');
