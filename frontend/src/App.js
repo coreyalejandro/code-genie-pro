@@ -448,9 +448,15 @@ function App() {
       const aiMessage = {
         type: 'ai',
         message: response.data.response,
+        skill_level: response.data.skill_level,
         timestamp: response.data.timestamp
       };
       setChatHistory(prev => [...prev, aiMessage]);
+      
+      // Update user profile if skill level changed
+      if (response.data.skill_level && (!userProfile || userProfile.skill_level !== response.data.skill_level)) {
+        setUserProfile({ skill_level: response.data.skill_level });
+      }
       
     } catch (err) {
       console.error('Chat error:', err);
@@ -464,6 +470,52 @@ function App() {
       setIsChatting(false);
     }
   };
+
+  const updateLearningProfile = async () => {
+    try {
+      let interactionData = {};
+      let topic = 'programming';
+      
+      if (activeTab === 'results' && result) {
+        interactionData = {
+          code_quality_score: result.code_analysis?.quality_score,
+          question_complexity: chatHistory.length > 0 ? 'intermediate' : 'basic',
+          code_patterns: ['algorithm'] // Could be enhanced based on actual code analysis
+        };
+        topic = 'algorithms';
+      } else if (activeTab === 'analysis' && analysisResult) {
+        interactionData = {
+          code_quality_score: analysisResult.code_analysis?.quality_score,
+          question_complexity: 'advanced', // Analysis tab indicates more advanced usage
+          code_patterns: ['code_analysis']
+        };
+        topic = 'code optimization';
+      }
+      
+      const response = await axios.post(`${API}/learning-profile`, {
+        session_id: sessionId,
+        interaction_data: interactionData,
+        topic: topic
+      });
+      
+      setUserProfile({
+        skill_level: response.data.skill_level,
+        knowledge_gaps: response.data.knowledge_gaps,
+        completed_concepts: response.data.completed_concepts
+      });
+      setPersonalizedSuggestions(response.data.personalized_suggestions);
+      
+    } catch (err) {
+      console.error('Learning profile update error:', err);
+    }
+  };
+
+  // Update learning profile when results are available
+  useEffect(() => {
+    if ((result || analysisResult) && sessionId) {
+      updateLearningProfile();
+    }
+  }, [result, analysisResult, sessionId]);
 
   const downloadCode = (code, language) => {
     const extensions = {
