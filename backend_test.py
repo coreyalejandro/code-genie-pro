@@ -737,10 +737,12 @@ def run_all_tests():
         ("Root Endpoint", test_root_endpoint),
         ("Process Endpoint (Text)", test_process_endpoint_text),
         ("Analyze Code Endpoint", test_analyze_code_endpoint),
-        ("Chat Endpoint", test_chat_endpoint),  # New test for chat functionality
-        ("Chat Endpoint Error Handling", test_chat_endpoint_error_handling),  # New test for error handling
+        ("Chat Endpoint", test_chat_endpoint),
+        ("Chat Endpoint Error Handling", test_chat_endpoint_error_handling),
+        ("Learning Profile Endpoint", test_learning_profile_endpoint),  # NEW: Personalized learning engine test
+        ("Enhanced Chat with Skill Adaptation", test_enhanced_chat_endpoint_with_skill_adaptation),  # NEW: Enhanced chat test
         # Add a delay between API calls to avoid rate limits
-        # We'll only test the first five endpoints to avoid hitting rate limits
+        # We'll only test the core endpoints to avoid hitting rate limits
         # ("Session Endpoint", test_session_endpoint),
         # ("Process Image Endpoint", test_process_image_endpoint)
     ]
@@ -756,7 +758,7 @@ def run_all_tests():
             if not result:
                 all_passed = False
             # Add a delay between tests to avoid rate limits
-            if name != "Chat Endpoint Error Handling":  # No need to wait after the last test
+            if name != "Enhanced Chat with Skill Adaptation":  # No need to wait after the last test
                 print(f"Waiting 10 seconds to avoid rate limits...")
                 time.sleep(10)
         except Exception as e:
