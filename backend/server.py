@@ -46,6 +46,16 @@ class ProcessingResult(BaseModel):
     code_analysis: dict = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
+class UserProfile(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    session_id: str
+    skill_level: str = "beginner"  # beginner, intermediate, advanced
+    learning_preferences: dict = Field(default_factory=dict)
+    interaction_history: List[dict] = Field(default_factory=list)
+    knowledge_gaps: List[str] = Field(default_factory=list)
+    completed_concepts: List[str] = Field(default_factory=list)
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+
 class SessionHistory(BaseModel):
     session_id: str
     results: List[ProcessingResult]
