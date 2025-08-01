@@ -380,6 +380,147 @@ Provide a helpful, conversational response. Be specific about the code when rele
         logging.error(f"Error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+async def analyze_user_skill_level(session_id: str, interaction_data: dict):
+    """Analyze user's skill level based on interactions"""
+    try:
+        # Get user profile
+        profile = await get_user_profile(session_id)
+        
+        # Analyze interaction complexity
+        complexity_indicators = 0
+        total_indicators = 0
+        
+        if interaction_data.get('code_quality_score'):
+            total_indicators += 1
+            if interaction_data['code_quality_score'] >= 8:
+                complexity_indicators += 1
+                
+        if interaction_data.get('question_complexity'):
+            total_indicators += 1
+            advanced_keywords = ['optimization', 'algorithm', 'complexity', 'performance', 'scalability']
+            if any(keyword in interaction_data.get('question', '').lower() for keyword in advanced_keywords):
+                complexity_indicators += 1
+        
+        if interaction_data.get('code_patterns'):
+            total_indicators += 1
+            if any(pattern in ['recursion', 'dynamic_programming', 'graph_algorithms'] 
+                   for pattern in interaction_data.get('code_patterns', [])):
+                complexity_indicators += 1
+        
+        # Update skill level
+        if total_indicators > 0:
+            complexity_ratio = complexity_indicators / total_indicators
+            if complexity_ratio >= 0.7:
+                profile.skill_level = "advanced"
+            elif complexity_ratio >= 0.4:
+                profile.skill_level = "intermediate"
+            else:
+                profile.skill_level = "beginner"
+        
+        # Save updated profile
+        await save_user_profile(profile)
+        return profile.skill_level
+        
+    except Exception as e:
+        logging.error(f"Error analyzing skill level: {str(e)}")
+        return "beginner"  # Default fallback
+
+async def get_user_profile(session_id: str) -> UserProfile:
+    """Get or create user profile"""
+    try:
+        profile_data = await db.user_profiles.find_one({"session_id": session_id})
+        if profile_data:
+            return UserProfile(**profile_data)
+        else:
+            # Create new profile
+            profile = UserProfile(session_id=session_id)
+            await save_user_profile(profile)
+            return profile
+    except Exception as e:
+        logging.error(f"Error getting user profile: {str(e)}")
+        return UserProfile(session_id=session_id)
+
+async def save_user_profile(profile: UserProfile):
+    """Save user profile to database"""
+    try:
+        profile.last_updated = datetime.utcnow()
+        await db.user_profiles.replace_one(
+            {"session_id": profile.session_id},
+            profile.dict(),
+            upsert=True
+        )
+    except Exception as e:
+        logging.error(f"Error saving user profile: {str(e)}")
+
+async def generate_personalized_suggestions(session_id: str, current_topic: str):
+    """Generate personalized learning suggestions"""
+    try:
+        profile = await get_user_profile(session_id)
+        chat = await get_gemini_chat(session_id)
+        
+        suggestions_prompt = f"""Based on this user profile, generate 3 personalized learning suggestions for the topic "{current_topic}":
+
+User Skill Level: {profile.skill_level}
+Knowledge Gaps: {', '.join(profile.knowledge_gaps) if profile.knowledge_gaps else 'None identified yet'}
+Completed Concepts: {', '.join(profile.completed_concepts) if profile.completed_concepts else 'None yet'}
+
+Generate suggestions that:
+1. Match their skill level
+2. Address knowledge gaps
+3. Build on completed concepts
+4. Are practical and actionable
+
+Format as JSON array: ["suggestion 1", "suggestion 2", "suggestion 3"]"""
+
+        suggestion_message = UserMessage(text=suggestions_prompt)
+        response = await chat.send_message(suggestion_message)
+        
+        try:
+            import json
+            return json.loads(response)
+        except:
+            return [
+                f"Practice more {current_topic} problems",
+                f"Learn advanced {current_topic} techniques",
+                f"Apply {current_topic} to real projects"
+            ]
+            
+    except Exception as e:
+        logging.error(f"Error generating suggestions: {str(e)}")
+        return ["Keep practicing!", "Try more examples", "Ask questions"]
+
+@api_router.post("/learning-profile")
+async def update_learning_profile(request: dict):
+    """Update user's learning profile and get personalized suggestions"""
+    try:
+        session_id = request.get('session_id')
+        interaction_data = request.get('interaction_data', {})
+        current_topic = request.get('topic', 'programming')
+        
+        if not session_id:
+            raise HTTPException(status_code=400, detail="Session ID is required")
+        
+        # Analyze and update skill level
+        skill_level = await analyze_user_skill_level(session_id, interaction_data)
+        
+        # Get updated profile
+        profile = await get_user_profile(session_id)
+        
+        # Generate personalized suggestions
+        suggestions = await generate_personalized_suggestions(session_id, current_topic)
+        
+        return {
+            "session_id": session_id,
+            "skill_level": skill_level,
+            "personalized_suggestions": suggestions,
+            "knowledge_gaps": profile.knowledge_gaps,
+            "completed_concepts": profile.completed_concepts
+        }
+        
+    except Exception as e:
+        logging.error(f"Error updating learning profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/")
 async def root():
     return {"message": "AI Multimodal Coding Assistant API"}
