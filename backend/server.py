@@ -337,7 +337,7 @@ async def get_session_history(session_id: str):
 
 @api_router.post("/chat")
 async def chat_about_code(request: dict):
-    """Interactive chat about code analysis or results"""
+    """Interactive chat about code analysis or results with adaptive responses"""
     session_id = request.get('session_id')
     message = request.get('message')
     context = request.get('context', {})  # Contains code, analysis, etc.
@@ -346,9 +346,12 @@ async def chat_about_code(request: dict):
         raise HTTPException(status_code=400, detail="Session ID and message are required")
     
     try:
+        # Get user profile for personalized responses
+        profile = await get_user_profile(session_id)
+        
         chat = await get_gemini_chat(session_id)
         
-        # Build context-aware prompt
+        # Build context-aware prompt with skill level adaptation
         context_prompt = ""
         if context.get('code'):
             context_prompt += f"Code being discussed:\n{context['code']}\n\n"
@@ -359,20 +362,41 @@ async def chat_about_code(request: dict):
             context_prompt += f"- Space Complexity: {analysis.get('space_complexity', 'N/A')}\n"
             context_prompt += f"- Quality Score: {analysis.get('quality_score', 'N/A')}/10\n\n"
         
-        # Create conversational prompt
-        full_prompt = f"""You are an expert programming tutor having a conversation about code. 
+        # Adapt response based on skill level
+        skill_instruction = {
+            "beginner": "Explain concepts simply with basic examples and avoid complex jargon.",
+            "intermediate": "Provide moderate detail with some technical terms and practical examples.", 
+            "advanced": "Give comprehensive technical explanations with advanced concepts and optimizations."
+        }.get(profile.skill_level, "Explain concepts clearly and appropriately.")
         
+        # Create adaptive conversational prompt
+        full_prompt = f"""You are an expert programming tutor having a conversation about code. 
+
+User Skill Level: {profile.skill_level}
+Instruction: {skill_instruction}
+
 {context_prompt}User question: {message}
 
-Provide a helpful, conversational response. Be specific about the code when relevant. Keep responses concise but informative."""
+Provide a helpful, conversational response adapted to their skill level. Be specific about the code when relevant. Keep responses concise but informative."""
 
         chat_message = UserMessage(text=full_prompt)
         response = await chat.send_message(chat_message)
+        
+        # Update interaction history
+        interaction = {
+            "message": message,
+            "response_length": len(response),
+            "timestamp": datetime.utcnow().isoformat(),
+            "context_type": "analysis" if context.get('analysis') else "code" if context.get('code') else "general"
+        }
+        profile.interaction_history.append(interaction)
+        await save_user_profile(profile)
         
         return {
             "session_id": session_id,
             "message": message,
             "response": response,
+            "skill_level": profile.skill_level,
             "timestamp": datetime.utcnow().isoformat()
         }
         
