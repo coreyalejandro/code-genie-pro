@@ -127,6 +127,8 @@ function App() {
   const [chatInput, setChatInput] = useState('');
   const [isChatting, setIsChatting] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [personalizedSuggestions, setPersonalizedSuggestions] = useState([]);
   
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
