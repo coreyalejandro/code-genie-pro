@@ -1412,10 +1412,35 @@ class LinkedList:
                     ? 'bg-red-600 text-white'
                     : 'bg-slate-700 text-slate-200'
                 }`}>
+                  {msg.skill_level && (
+                    <div className="text-xs opacity-75 mb-1">
+                      Adapted for: {msg.skill_level}
+                    </div>
+                  )}
                   <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
                 </div>
               </div>
             ))}
+            
+            {/* Personalized Suggestions */}
+            {personalizedSuggestions.length > 0 && (
+              <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-4">
+                <div className="flex items-center text-green-400 text-sm font-medium mb-3">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  Personalized Learning Suggestions
+                </div>
+                <ul className="space-y-2">
+                  {personalizedSuggestions.map((suggestion, i) => (
+                    <li key={i} className="text-green-200 text-sm flex items-start">
+                      <span className="text-green-400 mr-2">•</span>
+                      {suggestion}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             
             {isChatting && (
               <div className="flex justify-start">
