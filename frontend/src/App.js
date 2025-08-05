@@ -130,6 +130,13 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [personalizedSuggestions, setPersonalizedSuggestions] = useState([]);
   
+  // Local Authentication & Persistent Storage
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+  const [localAccounts, setLocalAccounts] = useState([]);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const flowchartRef = useRef(null);
