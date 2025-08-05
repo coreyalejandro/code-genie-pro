@@ -1793,7 +1793,183 @@ class LinkedList:
           </div>
         </div>
       )}
+      
+      {/* Authentication Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">
+                {authMode === 'login' ? 'Login to Account' : 'Create Account'}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowAuthModal(false);
+                  setAuthMode('login');
+                }}
+                className="text-slate-400 hover:text-white"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {authMode === 'login' ? (
+              <div>
+                {localAccounts.length > 0 ? (
+                  <div>
+                    <p className="text-slate-300 mb-4">Select your account:</p>
+                    <div className="space-y-2 mb-4">
+                      {localAccounts.map((account) => (
+                        <button
+                          key={account.username}
+                          onClick={() => {
+                            loginToAccount(account.username);
+                            setShowAuthModal(false);
+                            setAuthMode('login');
+                          }}
+                          className="w-full flex items-center space-x-3 p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-all text-left"
+                        >
+                          <span className="text-2xl">{account.avatar}</span>
+                          <div>
+                            <div className="text-white font-medium">{account.username}</div>
+                            <div className="text-xs text-slate-400">
+                              Last login: {new Date(account.lastLogin).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center text-slate-400 mb-4">
+                    <p>No local accounts found.</p>
+                  </div>
+                )}
+                
+                <button
+                  onClick={() => setAuthMode('signup')}
+                  className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all"
+                >
+                  Create New Account
+                </button>
+              </div>
+            ) : (
+              <CreateAccountForm 
+                onCreateAccount={(username, avatar) => {
+                  if (createLocalAccount(username, avatar)) {
+                    setShowAuthModal(false);
+                    setAuthMode('login');
+                  }
+                }}
+                onCancel={() => setAuthMode('login')}
+                existingUsernames={localAccounts.map(acc => acc.username)}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+// Create Account Form Component
+function CreateAccountForm({ onCreateAccount, onCancel, existingUsernames }) {
+  const [username, setUsername] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('🧑‍💻');
+  const [error, setError] = useState('');
+
+  const avatars = ['🧑‍💻', '👨‍💻', '👩‍💻', '🧙‍♂️', '🧙‍♀️', '🤖', '👨‍🔬', '👩‍🔬', '🧠', '💡', '🚀', '⭐'];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!username.trim()) {
+      setError('Username is required');
+      return;
+    }
+
+    if (username.length < 2) {
+      setError('Username must be at least 2 characters');
+      return;
+    }
+
+    if (existingUsernames.includes(username.trim())) {
+      setError('Username already exists');
+      return;
+    }
+
+    onCreateAccount(username.trim(), selectedAvatar);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="mb-4">
+        <label className="block text-slate-300 text-sm font-medium mb-2">
+          Username
+        </label>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter your username"
+          className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg border border-slate-600 focus:border-blue-500 focus:outline-none"
+          autoFocus
+        />
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-slate-300 text-sm font-medium mb-2">
+          Choose Avatar
+        </label>
+        <div className="grid grid-cols-6 gap-2">
+          {avatars.map((avatar) => (
+            <button
+              key={avatar}
+              type="button"
+              onClick={() => setSelectedAvatar(avatar)}
+              className={`p-3 text-2xl rounded-lg transition-all ${
+                selectedAvatar === avatar
+                  ? 'bg-blue-600 ring-2 ring-blue-400'
+                  : 'bg-slate-700 hover:bg-slate-600'
+              }`}
+            >
+              {avatar}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
+
+      <div className="flex space-x-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="flex-1 py-2 px-4 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-all"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="flex-1 py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all"
+        >
+          Create Account
+        </button>
+      </div>
+      
+      <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+        <p className="text-blue-200 text-xs">
+          🔒 Your account is stored locally on your device. No data is sent to servers.
+        </p>
+      </div>
+    </form>
   );
 }
 
