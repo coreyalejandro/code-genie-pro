@@ -744,11 +744,94 @@ function App() {
               <h1 className="text-6xl font-bold text-white tracking-tight">
                 Code <span className="text-transparent bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text">Genie</span>
               </h1>
+              
+              {/* User Account Section */}
+              <div className="ml-6 flex items-center space-x-4">
+                {currentUser ? (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowAccountMenu(!showAccountMenu)}
+                      className="flex items-center space-x-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-all"
+                    >
+                      <span className="text-2xl">{currentUser.avatar}</span>
+                      <div className="text-left">
+                        <div className="text-white font-medium">{currentUser.username}</div>
+                        {userProfile && (
+                          <div className="text-xs text-slate-300 capitalize">{userProfile.skill_level} Level</div>
+                        )}
+                      </div>
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Account Menu */}
+                    {showAccountMenu && (
+                      <div className="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-20">
+                        <div className="p-4 border-b border-slate-600">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-3xl">{currentUser.avatar}</span>
+                            <div>
+                              <div className="text-white font-medium">{currentUser.username}</div>
+                              <div className="text-xs text-slate-400">
+                                Member since {new Date(currentUser.created).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-2">
+                          <button
+                            onClick={() => {
+                              exportUserData();
+                              setShowAccountMenu(false);
+                            }}
+                            className="w-full text-left px-3 py-2 text-slate-300 hover:bg-slate-700 rounded flex items-center"
+                          >
+                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export Learning Data
+                          </button>
+                          <button
+                            onClick={() => setShowAuthModal(true)}
+                            className="w-full text-left px-3 py-2 text-slate-300 hover:bg-slate-700 rounded flex items-center"
+                          >
+                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4" />
+                            </svg>
+                            Switch Account
+                          </button>
+                          <button
+                            onClick={logoutUser}
+                            className="w-full text-left px-3 py-2 text-red-400 hover:bg-slate-700 rounded flex items-center"
+                          >
+                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowAuthModal(true)}
+                    className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-lg shadow-lg transition-all"
+                  >
+                    <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Create Account
+                  </button>
+                )}
+              </div>
+              
               {/* Chat Toggle Button */}
-              {(result || analysisResult) && (
+              {(result || analysisResult) && currentUser && (
                 <button
                   onClick={() => setShowChat(!showChat)}
-                  className={`ml-6 p-3 rounded-lg transition-all ${
+                  className={`ml-4 p-3 rounded-lg transition-all ${
                     showChat 
                       ? 'bg-green-600 hover:bg-green-700' 
                       : 'bg-blue-600 hover:bg-blue-700'
@@ -761,12 +844,25 @@ function App() {
                 </button>
               )}
             </div>
+            
             <p className="text-slate-300 text-xl max-w-3xl mx-auto mb-2">
               Your AI-powered multimodal coding assistant
             </p>
             <p className="text-slate-400 text-lg max-w-3xl mx-auto">
               Transform any input into pseudocode, flowcharts, and code in 10 programming languages
             </p>
+            
+            {/* Guest Mode Warning */}
+            {!currentUser && (
+              <div className="mt-6 max-w-2xl mx-auto p-4 bg-amber-900/20 border border-amber-500/30 rounded-lg">
+                <div className="flex items-center justify-center text-amber-400 text-sm">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  Guest Mode: Your progress won't be saved. Create an account to enable persistent learning!
+                </div>
+              </div>
+            )}
           </div>
 
         {/* Navigation Tabs */}
