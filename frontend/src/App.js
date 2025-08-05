@@ -141,6 +141,194 @@ function App() {
   const audioChunksRef = useRef([]);
   const flowchartRef = useRef(null);
 
+  // Local Storage Management
+  const LOCAL_STORAGE_KEYS = {
+    ACCOUNTS: 'codeGenie_accounts',
+    CURRENT_USER: 'codeGenie_current_user',
+    USER_DATA_PREFIX: 'codeGenie_user_'
+  };
+
+  // Initialize local accounts and current user on component mount
+  useEffect(() => {
+    try {
+      // Load existing accounts
+      const accounts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNTS) || '[]');
+      setLocalAccounts(accounts);
+      
+      // Load current user if exists
+      const currentUserData = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_USER);
+      if (currentUserData) {
+        const user = JSON.parse(currentUserData);
+        setCurrentUser(user);
+        loadUserData(user.username);
+      }
+    } catch (error) {
+      console.error('Error loading local user data:', error);
+    }
+  }, []);
+
+  const loadUserData = (username) => {
+    try {
+      const userData = localStorage.getItem(`${LOCAL_STORAGE_KEYS.USER_DATA_PREFIX}${username}`);
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        // Restore user-specific data
+        setUserProfile(parsedData.profile || null);
+        setChatHistory(parsedData.chatHistory || []);
+        setPersonalizedSuggestions(parsedData.personalizedSuggestions || []);
+        // Note: We don't restore result/analysisResult as they should be fresh per session
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
+
+  const saveUserData = (username, data) => {
+    try {
+      const existingData = JSON.parse(
+        localStorage.getItem(`${LOCAL_STORAGE_KEYS.USER_DATA_PREFIX}${username}`) || '{}'
+      );
+      
+      const updatedData = {
+        ...existingData,
+        ...data,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      localStorage.setItem(
+        `${LOCAL_STORAGE_KEYS.USER_DATA_PREFIX}${username}`,
+        JSON.stringify(updatedData)
+      );
+    } catch (error) {
+      console.error('Error saving user data:', error);
+    }
+  };
+
+  const createLocalAccount = (username, avatar = '🧑‍💻') => {
+    try {
+      const newAccount = {
+        username,
+        avatar,
+        created: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+      
+      const updatedAccounts = [...localAccounts, newAccount];
+      setLocalAccounts(updatedAccounts);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNTS, JSON.stringify(updatedAccounts));
+      
+      // Set as current user
+      setCurrentUser(newAccount);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_USER, JSON.stringify(newAccount));
+      
+      // Initialize empty user data
+      saveUserData(username, {
+        profile: null,
+        chatHistory: [],
+        personalizedSuggestions: [],
+        created: new Date().toISOString()
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error creating account:', error);
+      return false;
+    }
+  };
+
+  const loginToAccount = (username) => {
+    try {
+      const account = localAccounts.find(acc => acc.username === username);
+      if (account) {
+        const updatedAccount = { ...account, lastLogin: new Date().toISOString() };
+        
+        // Update account in list
+        const updatedAccounts = localAccounts.map(acc => 
+          acc.username === username ? updatedAccount : acc
+        );
+        setLocalAccounts(updatedAccounts);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNTS, JSON.stringify(updatedAccounts));
+        
+        // Set as current user
+        setCurrentUser(updatedAccount);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedAccount));
+        
+        // Load user data
+        loadUserData(username);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error logging in:', error);
+      return false;
+    }
+  };
+
+  const logoutUser = () => {
+    try {
+      // Save current data before logout
+      if (currentUser) {
+        saveUserData(currentUser.username, {
+          profile: userProfile,
+          chatHistory,
+          personalizedSuggestions
+        });
+      }
+      
+      // Clear current user
+      setCurrentUser(null);
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.CURRENT_USER);
+      
+      // Reset UI state
+      setUserProfile(null);
+      setChatHistory([]);
+      setPersonalizedSuggestions([]);
+      setShowChat(false);
+      setShowAccountMenu(false);
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+  const exportUserData = () => {
+    if (!currentUser) return;
+    
+    try {
+      const userData = localStorage.getItem(`${LOCAL_STORAGE_KEYS.USER_DATA_PREFIX}${currentUser.username}`);
+      const exportData = {
+        account: currentUser,
+        userData: userData ? JSON.parse(userData) : {},
+        exportedAt: new Date().toISOString(),
+        version: "1.0"
+      };
+      
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CodeGenie_${currentUser.username}_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting data:', error);
+    }
+  };
+
+  // Auto-save user data when it changes
+  useEffect(() => {
+    if (currentUser && (userProfile || chatHistory.length > 0 || personalizedSuggestions.length > 0)) {
+      const timeoutId = setTimeout(() => {
+        saveUserData(currentUser.username, {
+          profile: userProfile,
+          chatHistory,
+          personalizedSuggestions
+        });
+      }, 1000); // Debounce saves
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentUser, userProfile, chatHistory, personalizedSuggestions]);
+
   // Get a new random example
   const getNewExample = () => {
     setCurrentExample(getRandomExample());
