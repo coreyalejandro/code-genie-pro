@@ -91,7 +91,9 @@ function App() {
         target_language: selectedOutputLanguage
       });
       
-      const targetCode = response.data.code_outputs[selectedOutputLanguage] || '';
+      const targetCode = response.data.code_outputs[selectedOutputLanguage] || 
+                        response.data.pseudocode || // Fallback for direct translation
+                        'Translation failed';
       setOutputCode(targetCode);
       
     } catch (err) {
