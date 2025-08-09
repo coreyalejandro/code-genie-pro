@@ -221,8 +221,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "Code Switch Redesign - Zen Minimalist UI"
+  stuck_tasks:
+    - "Code Switch Redesign - Zen Minimalist UI"
   test_all: false
   test_priority: "high_first"
 
