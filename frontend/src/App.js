@@ -272,7 +272,7 @@ function App() {
             
             {/* Code Side */}
             <div className="space-y-6">
-              <div className="text-gray-400 text-sm font-light tracking-wider">
+              <div className="text-zinc-400 text-sm font-light tracking-wider">
                 CODE
               </div>
               
@@ -280,13 +280,13 @@ function App() {
                 value={analysisCode}
                 onChange={(e) => setAnalysisCode(e.target.value)}
                 placeholder="paste code to analyze"
-                className="w-full h-96 bg-transparent border border-gray-800 focus:border-gray-600 outline-none p-6 text-sm leading-relaxed resize-none"
+                className="w-full h-96 bg-transparent border border-zinc-800 focus:border-zinc-600 outline-none p-6 text-sm leading-relaxed resize-none"
               />
               
               <button
                 onClick={analyzeCode}
                 disabled={isProcessing || !analysisCode.trim()}
-                className="w-full py-3 border border-gray-800 hover:border-gray-600 disabled:border-gray-900 disabled:text-gray-600 transition-colors text-sm font-light tracking-wider"
+                className="w-full py-3 border border-zinc-800 hover:border-zinc-600 disabled:border-zinc-900 disabled:text-zinc-600 transition-colors text-sm font-light tracking-wider"
               >
                 {isProcessing ? 'analyzing...' : 'analyze'}
               </button>
@@ -294,38 +294,38 @@ function App() {
 
             {/* Analysis Side */}
             <div className="space-y-8">
-              <div className="text-gray-400 text-sm font-light tracking-wider">
+              <div className="text-zinc-400 text-sm font-light tracking-wider">
                 ANALYSIS
               </div>
               
               {analysisResult ? (
                 <div className="space-y-8">
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-900">
-                      <span className="text-gray-400 text-sm">complexity</span>
-                      <span className="text-white font-light">{analysisResult.code_analysis?.time_complexity || 'N/A'}</span>
+                    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+                      <span className="text-zinc-400 text-sm">complexity</span>
+                      <span className="text-zinc-50 font-light">{analysisResult.code_analysis?.time_complexity || 'N/A'}</span>
                     </div>
                     
-                    <div className="flex justify-between items-center py-2 border-b border-gray-900">
-                      <span className="text-gray-400 text-sm">quality</span>
+                    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+                      <span className="text-zinc-400 text-sm">quality</span>
                       <div className="flex items-center space-x-2">
-                        <div className="w-20 h-1 bg-gray-800">
+                        <div className="w-20 h-1 bg-zinc-800">
                           <div 
-                            className="h-full bg-white" 
+                            className="h-full bg-zinc-50" 
                             style={{width: `${(analysisResult.code_analysis?.quality_score || 0) * 10}%`}}
                           ></div>
                         </div>
-                        <span className="text-white text-sm">{analysisResult.code_analysis?.quality_score || 0}/10</span>
+                        <span className="text-zinc-50 text-sm">{analysisResult.code_analysis?.quality_score || 0}/10</span>
                       </div>
                     </div>
                   </div>
                   
                   {analysisResult.code_analysis?.optimizations && (
                     <div className="space-y-3">
-                      <div className="text-gray-400 text-sm">suggestions:</div>
+                      <div className="text-zinc-400 text-sm">suggestions:</div>
                       <div className="space-y-2">
                         {analysisResult.code_analysis.optimizations.map((opt, i) => (
-                          <div key={i} className="text-sm text-gray-300">
+                          <div key={i} className="text-sm text-zinc-300">
                             • {opt}
                           </div>
                         ))}
@@ -333,12 +333,12 @@ function App() {
                     </div>
                   )}
                   
-                  <button className="text-xs text-gray-500 hover:text-gray-300 tracking-wide">
+                  <button className="text-xs text-zinc-500 hover:text-zinc-300 tracking-wide">
                     ✎ refactor
                   </button>
                 </div>
               ) : (
-                <div className="text-gray-600 text-sm font-light">
+                <div className="text-zinc-600 text-sm font-light">
                   analysis will appear here
                 </div>
               )}
@@ -352,34 +352,34 @@ function App() {
             
             {/* Journey Side */}
             <div className="space-y-8">
-              <div className="text-gray-400 text-sm font-light tracking-wider">
+              <div className="text-zinc-400 text-sm font-light tracking-wider">
                 YOUR JOURNEY
               </div>
               
               {currentUser ? (
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-900">
-                      <span className="text-gray-400 text-sm">skill level</span>
-                      <span className="text-white font-light capitalize">
+                    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+                      <span className="text-zinc-400 text-sm">skill level</span>
+                      <span className="text-zinc-50 font-light capitalize">
                         {userProfile?.skill_level || 'beginner'}
                       </span>
                     </div>
                     
-                    <div className="flex justify-between items-center py-2 border-b border-gray-900">
-                      <span className="text-gray-400 text-sm">progress</span>
-                      <div className="w-20 h-1 bg-gray-800">
-                        <div className="w-3/4 h-full bg-white"></div>
+                    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+                      <span className="text-zinc-400 text-sm">progress</span>
+                      <div className="w-20 h-1 bg-zinc-800">
+                        <div className="w-3/4 h-full bg-zinc-50"></div>
                       </div>
                     </div>
                   </div>
                   
                   {personalizedSuggestions.length > 0 && (
                     <div className="space-y-3">
-                      <div className="text-gray-400 text-sm">next:</div>
+                      <div className="text-zinc-400 text-sm">next:</div>
                       <div className="space-y-2">
                         {personalizedSuggestions.slice(0, 3).map((suggestion, i) => (
-                          <div key={i} className="text-sm text-gray-300">
+                          <div key={i} className="text-sm text-zinc-300">
                             • {suggestion}
                           </div>
                         ))}
@@ -389,12 +389,12 @@ function App() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="text-gray-600 text-sm font-light">
+                  <div className="text-zinc-600 text-sm font-light">
                     create account to track progress
                   </div>
                   <button 
                     onClick={() => {/* show auth modal */}}
-                    className="py-2 px-6 border border-gray-800 hover:border-gray-600 transition-colors text-sm font-light tracking-wider"
+                    className="py-2 px-6 border border-zinc-800 hover:border-zinc-600 transition-colors text-sm font-light tracking-wider"
                   >
                     sign up
                   </button>
@@ -404,20 +404,20 @@ function App() {
 
             {/* Tutor Side */}
             <div className="space-y-6">
-              <div className="text-gray-400 text-sm font-light tracking-wider">
+              <div className="text-zinc-400 text-sm font-light tracking-wider">
                 AI TUTOR
               </div>
               
-              <div className="border border-gray-800 h-80 p-4 space-y-4 overflow-y-auto">
+              <div className="border border-zinc-800 h-80 p-4 space-y-4 overflow-y-auto">
                 {chatHistory.length === 0 ? (
-                  <div className="text-gray-600 text-sm font-light">
+                  <div className="text-zinc-600 text-sm font-light">
                     ask anything about coding
                   </div>
                 ) : (
                   chatHistory.map((msg, i) => (
                     <div key={i} className={`text-sm ${
-                      msg.type === 'user' ? 'text-white' : 
-                      msg.type === 'error' ? 'text-gray-500' : 'text-gray-300'
+                      msg.type === 'user' ? 'text-zinc-50' : 
+                      msg.type === 'error' ? 'text-zinc-500' : 'text-zinc-300'
                     }`}>
                       {msg.type === 'user' ? '> ' : ''}
                       {msg.message}
@@ -433,12 +433,12 @@ function App() {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
                   placeholder="ask anything"
-                  className="flex-1 bg-transparent border border-gray-800 focus:border-gray-600 outline-none p-3 text-sm"
+                  className="flex-1 bg-transparent border border-zinc-800 focus:border-zinc-600 outline-none p-3 text-sm"
                 />
                 <button
                   onClick={sendChatMessage}
                   disabled={!chatInput.trim() || !currentUser}
-                  className="px-6 py-3 border border-gray-800 hover:border-gray-600 disabled:border-gray-900 disabled:text-gray-600 transition-colors text-sm"
+                  className="px-6 py-3 border border-zinc-800 hover:border-zinc-600 disabled:border-zinc-900 disabled:text-zinc-600 transition-colors text-sm"
                 >
                   send
                 </button>
@@ -449,7 +449,7 @@ function App() {
 
         {/* Error Display */}
         {error && (
-          <div className="fixed bottom-8 right-8 bg-gray-900 border border-gray-700 p-4 text-sm text-gray-300">
+          <div className="fixed bottom-8 right-8 bg-zinc-900 border border-zinc-700 p-4 text-sm text-zinc-300">
             {error}
           </div>
         )}
