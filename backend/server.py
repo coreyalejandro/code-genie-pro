@@ -212,7 +212,8 @@ async def process_input(request: ProcessingRequest):
             request.session_id, 
             request.content, 
             request.input_type,
-            request.description
+            request.description,
+            getattr(request, 'target_language', None)
         )
         
         # Analyze code quality and complexity
