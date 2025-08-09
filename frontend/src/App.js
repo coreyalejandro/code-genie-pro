@@ -199,7 +199,7 @@ function App() {
             
             {/* Input Side */}
             <div className="space-y-6">
-              <div className="text-gray-400 text-sm font-light tracking-wider">
+              <div className="text-zinc-400 text-sm font-light tracking-wider">
                 INPUT
               </div>
               
@@ -207,17 +207,17 @@ function App() {
                 value={inputCode}
                 onChange={(e) => setInputCode(e.target.value)}
                 placeholder="paste code here"
-                className="w-full h-96 bg-transparent border border-gray-800 focus:border-gray-600 outline-none p-6 text-sm leading-relaxed resize-none"
+                className="w-full h-96 bg-transparent border border-zinc-800 focus:border-zinc-600 outline-none p-6 text-sm leading-relaxed resize-none"
               />
               
               <div className="space-y-3">
                 <select
                   value={selectedOutputLanguage}
                   onChange={(e) => setSelectedOutputLanguage(e.target.value)}
-                  className="w-full bg-transparent border border-gray-800 focus:border-gray-600 outline-none p-3 text-sm"
+                  className="w-full bg-transparent border border-zinc-800 focus:border-zinc-600 outline-none p-3 text-sm"
                 >
                   {LANGUAGE_OPTIONS.map(lang => (
-                    <option key={lang.key} value={lang.key} className="bg-black">
+                    <option key={lang.key} value={lang.key} className="bg-zinc-950">
                       {lang.name}
                     </option>
                   ))}
@@ -226,7 +226,7 @@ function App() {
                 <button
                   onClick={translateCode}
                   disabled={isProcessing || !inputCode.trim()}
-                  className="w-full py-3 border border-gray-800 hover:border-gray-600 disabled:border-gray-900 disabled:text-gray-600 transition-colors text-sm font-light tracking-wider"
+                  className="w-full py-3 border border-zinc-800 hover:border-zinc-600 disabled:border-zinc-900 disabled:text-zinc-600 transition-colors text-sm font-light tracking-wider"
                 >
                   {isProcessing ? 'translating...' : 'translate'}
                 </button>
@@ -236,13 +236,13 @@ function App() {
             {/* Output Side */}
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <div className="text-gray-400 text-sm font-light tracking-wider">
+                <div className="text-zinc-400 text-sm font-light tracking-wider">
                   OUTPUT
                 </div>
                 {outputCode && (
                   <button
                     onClick={copyToRefactor}
-                    className="text-xs text-gray-500 hover:text-gray-300 tracking-wide"
+                    className="text-xs text-zinc-500 hover:text-zinc-300 tracking-wide"
                   >
                     → refactor tab
                   </button>
@@ -254,10 +254,10 @@ function App() {
                   value={outputCode}
                   onChange={(e) => setOutputCode(e.target.value)}
                   placeholder="translated code appears here"
-                  className="w-full h-96 bg-transparent border border-gray-800 focus:border-gray-600 outline-none p-6 text-sm leading-relaxed resize-none"
+                  className="w-full h-96 bg-transparent border border-zinc-800 focus:border-zinc-600 outline-none p-6 text-sm leading-relaxed resize-none"
                 />
                 {outputCode && (
-                  <div className="absolute bottom-4 right-4 text-xs text-gray-600">
+                  <div className="absolute bottom-4 right-4 text-xs text-zinc-600">
                     ✎ edit
                   </div>
                 )}
