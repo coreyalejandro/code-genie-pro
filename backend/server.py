@@ -94,36 +94,46 @@ For code, write clean, well-commented, production-ready code.
 Always be thorough and accurate in your conversions."""
     ).with_model("gemini", "gemini-2.0-flash")
 
-async def process_with_gemini(session_id: str, content: str, input_type: str, description: str = None):
-    """Process input with Gemini and generate pseudocode, flowchart, and code"""
+async def process_with_gemini(session_id: str, content: str, input_type: str, description: str = None, target_language: str = None):
+    """Process multimodal input and generate pseudocode, flowchart, and code"""
     try:
         chat = await get_gemini_chat(session_id)
         
-        # Create the processing prompt
-        if input_type == "text":
-            prompt = f"Convert this text description into pseudocode, flowchart, and code:\n\n{content}"
-        elif input_type == "code":
-            prompt = f"Analyze this code and create pseudocode, flowchart, and equivalent implementations:\n\n{content}"
+        # Generate pseudocode
+        if input_type == "code":
+            if target_language:
+                pseudocode_prompt = f"Convert this code to {target_language}. Only return the converted code, no explanations:\n\n{content}"
+            else:
+                pseudocode_prompt = f"Analyze this code and create pseudocode, flowchart, and equivalent implementations:\n\n{content}"
+        elif input_type == "text":
+            pseudocode_prompt = f"Convert this text description into pseudocode, flowchart, and code:\n\n{content}"
         elif input_type == "image":
-            prompt = f"Analyze this image (which contains {description or 'programming-related content'}) and convert it into pseudocode, flowchart, and code:\n\nImage data: {content}"
+            pseudocode_prompt = f"Analyze this image (which contains {description or 'programming-related content'}) and convert it into pseudocode, flowchart, and code:\n\nImage data: {content}"
         elif input_type == "audio":
-            prompt = f"Based on this audio transcript: '{content}', create pseudocode, flowchart, and code implementation."
+            pseudocode_prompt = f"Based on this audio transcript: '{content}', create pseudocode, flowchart, and code implementation."
         else:
-            prompt = f"Process this input and create pseudocode, flowchart, and code:\n\n{content}"
-
-        # Step 1: Generate pseudocode
+            pseudocode_prompt = f"Process this input and create pseudocode, flowchart, and code:\n\n{content}"
+        
         pseudocode_message = UserMessage(
-            text=f"{prompt}\n\nPlease provide ONLY the pseudocode in a clear, structured format. Use proper indentation and clear logic flow."
+            text=f"{pseudocode_prompt}\n\nPlease provide ONLY the pseudocode in a clear, structured format. Use proper indentation and clear logic flow."
         )
         pseudocode_response = await chat.send_message(pseudocode_message)
         
-        # Step 2: Generate flowchart
+        # If target_language specified for code translation, return early with just that language
+        if input_type == "code" and target_language:
+            return {
+                "pseudocode": pseudocode_response,  # Actually contains the translated code
+                "flowchart": "",
+                "code_outputs": {target_language: pseudocode_response}
+            }
+        
+        # Generate flowchart (Mermaid syntax)
         flowchart_message = UserMessage(
             text=f"Based on this pseudocode:\n\n{pseudocode_response}\n\nCreate a Mermaid.js flowchart. Provide ONLY the Mermaid.js code starting with 'flowchart TD' or 'graph TD'."
         )
         flowchart_response = await chat.send_message(flowchart_message)
         
-        # Step 3: Generate code for all languages
+        # Generate code in multiple languages
         code_outputs = {}
         for lang_key, lang_name in PROGRAMMING_LANGUAGES.items():
             code_message = UserMessage(
