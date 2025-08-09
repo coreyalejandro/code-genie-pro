@@ -35,6 +35,7 @@ class ProcessingRequest(BaseModel):
     input_type: str  # 'text', 'image', 'audio', 'code'
     content: str
     description: Optional[str] = None
+    target_language: Optional[str] = None
 
 class ProcessingResult(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
