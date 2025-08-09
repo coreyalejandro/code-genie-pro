@@ -162,7 +162,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-mono">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-mono">
       <div className="max-w-7xl mx-auto p-8">
         
         {/* Header */}
@@ -183,8 +183,8 @@ function App() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`text-xl font-light tracking-wide transition-all duration-300 ${
                   activeTab === tab.id 
-                    ? 'border-b-2 border-white pb-1'
-                    : 'text-gray-500 hover:text-gray-300'
+                    ? 'border-b-2 border-zinc-50 pb-1'
+                    : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
                 {tab.label}
