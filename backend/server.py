@@ -122,10 +122,15 @@ async def process_with_gemini(session_id: str, content: str, input_type: str, de
         
         # If target_language specified for code translation, return early with just that language
         if input_type == "code" and target_language:
+            # Direct translation without pseudocode generation
+            translate_prompt = f"Convert this code directly to {target_language}. Return only clean, working {target_language} code:\n\n{content}"
+            translate_message = UserMessage(text=translate_prompt)
+            translated_code = await chat.send_message(translate_message)
+            
             return {
-                "pseudocode": pseudocode_response,  # Actually contains the translated code
+                "pseudocode": translated_code,  # Contains the translated code
                 "flowchart": "",
-                "code_outputs": {target_language: pseudocode_response}
+                "code_outputs": {target_language: translated_code}
             }
         
         # Generate flowchart (Mermaid syntax)
