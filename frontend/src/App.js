@@ -425,8 +425,9 @@ function App() {
                     create account to track progress
                   </div>
                   <button 
-                    onClick={() => {/* show auth modal */}}
+                    onClick={() => setShowAuthModal(true)}
                     className="py-2 px-6 border border-zinc-800 hover:border-zinc-600 transition-colors text-sm font-light tracking-wider"
+                    style={{borderColor: '#27272a'}}
                   >
                     sign up
                   </button>
