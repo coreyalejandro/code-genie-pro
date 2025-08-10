@@ -165,6 +165,29 @@ function App() {
     }
   };
 
+  const createLocalAccount = (username, avatar = '🧑‍💻') => {
+    try {
+      const newAccount = {
+        username,
+        avatar,
+        created: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+      
+      const updatedAccounts = [...localAccounts, newAccount];
+      setLocalAccounts(updatedAccounts);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNTS, JSON.stringify(updatedAccounts));
+      
+      setCurrentUser(newAccount);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_USER, JSON.stringify(newAccount));
+      
+      return true;
+    } catch (error) {
+      console.error('Error creating account:', error);
+      return false;
+    }
+  };
+
   const copyToRefactor = () => {
     setAnalysisCode(outputCode);
     setActiveTab('analyze');
