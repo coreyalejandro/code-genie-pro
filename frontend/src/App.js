@@ -5,6 +5,7 @@ import axios from 'axios';
 const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001/api';
 
 const LANGUAGE_OPTIONS = [
+  { key: 'pseudocode', name: 'Pseudocode', ext: 'txt' },
   { key: 'python', name: 'Python', ext: 'py' },
   { key: 'javascript', name: 'JavaScript', ext: 'js' },
   { key: 'java', name: 'Java', ext: 'java' },
