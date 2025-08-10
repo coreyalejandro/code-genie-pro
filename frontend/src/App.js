@@ -44,6 +44,11 @@ function App() {
   const [chatInput, setChatInput] = useState('');
   const [personalizedSuggestions, setPersonalizedSuggestions] = useState([]);
   
+  // Auth states
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [localAccounts, setLocalAccounts] = useState([]);
+  
   // Local storage management
   const LOCAL_STORAGE_KEYS = {
     ACCOUNTS: 'codeSwitch_accounts',
