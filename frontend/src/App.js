@@ -486,8 +486,105 @@ function App() {
             {error}
           </div>
         )}
+        {/* Auth Modal */}
+        {showAuthModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="rounded-xl p-6 w-full max-w-md mx-4" style={{backgroundColor: '#18181b'}}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-light text-white">Create Account</h2>
+                <button
+                  onClick={() => setShowAuthModal(false)}
+                  className="text-zinc-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+              <CreateAccountForm 
+                onCreateAccount={(username, avatar) => {
+                  if (createLocalAccount(username, avatar)) {
+                    setShowAuthModal(false);
+                  }
+                }}
+                onCancel={() => setShowAuthModal(false)}
+                existingUsernames={localAccounts.map(acc => acc.username)}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+function CreateAccountForm({ onCreateAccount, onCancel, existingUsernames }) {
+  const [username, setUsername] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('🧑‍💻');
+  const [error, setError] = useState('');
+
+  const avatars = ['🧑‍💻', '👨‍💻', '👩‍💻', '🧙‍♂️', '🧙‍♀️', '🤖'];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!username.trim()) {
+      setError('Username required');
+      return;
+    }
+    if (existingUsernames.includes(username.trim())) {
+      setError('Username exists');
+      return;
+    }
+    onCreateAccount(username.trim(), selectedAvatar);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="mb-4">
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="username"
+          className="w-full px-3 py-2 bg-transparent text-white rounded border text-sm"
+          style={{borderColor: '#27272a', backgroundColor: '#09090b'}}
+          autoFocus
+        />
+      </div>
+      <div className="mb-6">
+        <div className="grid grid-cols-6 gap-2">
+          {avatars.map((avatar) => (
+            <button
+              key={avatar}
+              type="button"
+              onClick={() => setSelectedAvatar(avatar)}
+              className={`p-2 text-lg rounded transition-all ${
+                selectedAvatar === avatar ? 'ring-2 ring-white' : ''
+              }`}
+              style={{backgroundColor: selectedAvatar === avatar ? '#27272a' : '#18181b'}}
+            >
+              {avatar}
+            </button>
+          ))}
+        </div>
+      </div>
+      {error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
+      <div className="flex space-x-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="flex-1 py-2 px-4 text-white font-light rounded border text-sm"
+          style={{borderColor: '#27272a'}}
+        >
+          cancel
+        </button>
+        <button
+          type="submit"
+          className="flex-1 py-2 px-4 text-white font-light rounded border text-sm"
+          style={{borderColor: '#27272a', backgroundColor: '#18181b'}}
+        >
+          create
+        </button>
+      </div>
+    </form>
   );
 }
 
