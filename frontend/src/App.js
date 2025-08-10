@@ -58,6 +58,9 @@ function App() {
 
   useEffect(() => {
     try {
+      const accounts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNTS) || '[]');
+      setLocalAccounts(accounts);
+      
       const currentUserData = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_USER);
       if (currentUserData) {
         const user = JSON.parse(currentUserData);
