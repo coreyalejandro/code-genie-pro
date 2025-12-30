@@ -115,4 +115,11 @@ See `DESIGN_SYSTEM.md` for complete component patterns including:
 
 ### CSS Linter Warnings
 
-If you see warnings about "Unknown at rule @tailwind" in `index.css`, these are expected and harmless. The `@tailwind` directives are valid Tailwind CSS syntax that gets processed by PostCSS. The `.vscode/settings.json` file included in this export will suppress these warnings in VS Code.
+If you see warnings about "Unknown at rule @tailwind" in `index.css`, these are expected and harmless. The `@tailwind` directives are valid Tailwind CSS syntax that gets processed by PostCSS.
+
+**To suppress these warnings in VS Code:**
+
+1. Copy the `.vscode/settings.json` file from this export to your project root
+2. Reload VS Code (Command/Ctrl + Shift + P → "Reload Window")
+
+The settings file configures VS Code to ignore unknown at-rules, which will suppress the `@tailwind` warnings.
