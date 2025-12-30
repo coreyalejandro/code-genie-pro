@@ -1,5 +1,4 @@
 from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form
-from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -11,9 +10,8 @@ from typing import List, Optional
 import uuid
 from datetime import datetime
 import base64
-import tempfile
 import asyncio
-import google.generativeai as genai
+import google.generativeai as genai  # type: ignore[reportMissingImports]
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -94,8 +92,13 @@ Always be thorough and accurate in your conversions."""
 
 async def get_gemini_model():
     """Get Gemini model instance"""
+    # Configure API key if not already configured
+    api_key = os.environ.get('GEMINI_API_KEY')
+    if api_key:
+        genai.configure(api_key=api_key)
+    
     return genai.GenerativeModel(
-        model_name='gemini-2.0-flash-exp',
+        model_name='gemini-1.5-flash',  # Using stable model with better quota limits
         system_instruction=SYSTEM_MESSAGE
     )
 
@@ -196,7 +199,7 @@ Format response as JSON:
         import json
         try:
             return json.loads(response.text)
-        except:
+        except Exception:
             # Fallback if JSON parsing fails
             return {
                 "time_complexity": "Analysis pending",
@@ -378,7 +381,7 @@ async def chat_about_code(request: dict):
             context_prompt += f"Code being discussed:\n{context['code']}\n\n"
         if context.get('analysis'):
             analysis = context['analysis']
-            context_prompt += f"Previous Analysis:\n"
+            context_prompt += "Previous Analysis:\n"
             context_prompt += f"- Time Complexity: {analysis.get('time_complexity', 'N/A')}\n"
             context_prompt += f"- Space Complexity: {analysis.get('space_complexity', 'N/A')}\n"
             context_prompt += f"- Quality Score: {analysis.get('quality_score', 'N/A')}/10\n\n"
@@ -522,7 +525,7 @@ Format as JSON array: ["suggestion 1", "suggestion 2", "suggestion 3"]"""
         try:
             import json
             return json.loads(response_obj.text)
-        except:
+        except Exception:
             return [
                 f"Practice more {current_topic} problems",
                 f"Learn advanced {current_topic} techniques",

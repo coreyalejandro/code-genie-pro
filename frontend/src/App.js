@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 
-const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001/api';
+const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000/api';
 
 const LANGUAGE_OPTIONS = [
   { key: 'pseudocode', name: 'Pseudocode', ext: 'txt' },
@@ -158,9 +158,12 @@ function App() {
       
     } catch (err) {
       console.error('Chat error:', err);
+      const errorMessage = err.response?.data?.detail || err.message || 'Sorry, I had trouble responding.';
       setChatHistory(prev => [...prev, { 
         type: 'error', 
-        message: 'Sorry, I had trouble responding.' 
+        message: errorMessage.includes('quota') || errorMessage.includes('429') 
+          ? 'API quota exceeded. Please try again later or check your API key limits.'
+          : 'Sorry, I had trouble responding.' 
       }]);
     }
   };
