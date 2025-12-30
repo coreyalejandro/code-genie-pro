@@ -13,7 +13,7 @@ from datetime import datetime
 import base64
 import tempfile
 import asyncio
-from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent, FileContentWithMimeType
+import google.generativeai as genai
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -75,12 +75,10 @@ PROGRAMMING_LANGUAGES = {
     "kotlin": "Kotlin"
 }
 
-async def get_gemini_chat(session_id: str):
-    """Create a new Gemini chat instance for each request"""
-    return LlmChat(
-        api_key=os.environ.get('GEMINI_API_KEY'),
-        session_id=session_id,
-        system_message="""You are an expert programming assistant that converts any input into pseudocode, flowcharts, and multiple programming languages.
+# Initialize Gemini API
+genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
+
+SYSTEM_MESSAGE = """You are an expert programming assistant that converts any input into pseudocode, flowcharts, and multiple programming languages.
 
 When given any input (text description, code, image, or audio transcript), you should:
 1. First understand the logic/algorithm described
@@ -93,12 +91,18 @@ For flowcharts, use Mermaid.js syntax with proper flow control.
 For code, write clean, well-commented, production-ready code.
 
 Always be thorough and accurate in your conversions."""
-    ).with_model("gemini", "gemini-2.0-flash")
+
+async def get_gemini_model():
+    """Get Gemini model instance"""
+    return genai.GenerativeModel(
+        model_name='gemini-2.0-flash-exp',
+        system_instruction=SYSTEM_MESSAGE
+    )
 
 async def process_with_gemini(session_id: str, content: str, input_type: str, description: str = None, target_language: str = None):
     """Process multimodal input and generate pseudocode, flowchart, and code"""
     try:
-        chat = await get_gemini_chat(session_id)
+        model = await get_gemini_model()
         
         # Generate pseudocode
         if input_type == "code":
@@ -115,17 +119,16 @@ async def process_with_gemini(session_id: str, content: str, input_type: str, de
         else:
             pseudocode_prompt = f"Process this input and create pseudocode, flowchart, and code:\n\n{content}"
         
-        pseudocode_message = UserMessage(
-            text=f"{pseudocode_prompt}\n\nPlease provide ONLY the pseudocode in a clear, structured format. Use proper indentation and clear logic flow."
-        )
-        pseudocode_response = await chat.send_message(pseudocode_message)
+        prompt = f"{pseudocode_prompt}\n\nPlease provide ONLY the pseudocode in a clear, structured format. Use proper indentation and clear logic flow."
+        response = await asyncio.to_thread(model.generate_content, prompt)
+        pseudocode_response = response.text
         
         # If target_language specified for code translation, return early with just that language
         if input_type == "code" and target_language:
             # Direct translation without pseudocode generation
             translate_prompt = f"Convert this code directly to {target_language}. Return only clean, working {target_language} code:\n\n{content}"
-            translate_message = UserMessage(text=translate_prompt)
-            translated_code = await chat.send_message(translate_message)
+            response = await asyncio.to_thread(model.generate_content, translate_prompt)
+            translated_code = response.text
             
             return {
                 "pseudocode": translated_code,  # Contains the translated code
@@ -134,19 +137,16 @@ async def process_with_gemini(session_id: str, content: str, input_type: str, de
             }
         
         # Generate flowchart (Mermaid syntax)
-        flowchart_message = UserMessage(
-            text=f"Based on this pseudocode:\n\n{pseudocode_response}\n\nCreate a Mermaid.js flowchart. Provide ONLY the Mermaid.js code starting with 'flowchart TD' or 'graph TD'."
-        )
-        flowchart_response = await chat.send_message(flowchart_message)
+        flowchart_prompt = f"Based on this pseudocode:\n\n{pseudocode_response}\n\nCreate a Mermaid.js flowchart. Provide ONLY the Mermaid.js code starting with 'flowchart TD' or 'graph TD'."
+        response = await asyncio.to_thread(model.generate_content, flowchart_prompt)
+        flowchart_response = response.text
         
         # Generate code in multiple languages
         code_outputs = {}
         for lang_key, lang_name in PROGRAMMING_LANGUAGES.items():
-            code_message = UserMessage(
-                text=f"Convert this pseudocode to {lang_name}:\n\n{pseudocode_response}\n\nProvide ONLY the {lang_name} code, clean and well-commented."
-            )
-            code_response = await chat.send_message(code_message)
-            code_outputs[lang_key] = code_response
+            code_prompt = f"Convert this pseudocode to {lang_name}:\n\n{pseudocode_response}\n\nProvide ONLY the {lang_name} code, clean and well-commented."
+            response = await asyncio.to_thread(model.generate_content, code_prompt)
+            code_outputs[lang_key] = response.text
         
         return {
             "pseudocode": pseudocode_response,
@@ -161,7 +161,7 @@ async def process_with_gemini(session_id: str, content: str, input_type: str, de
 async def analyze_code_with_ai(session_id: str, pseudocode: str, code_outputs: dict):
     """Analyze code for complexity, optimization opportunities, and quality"""
     try:
-        chat = await get_gemini_chat(session_id)
+        model = await get_gemini_model()
         
         # Analyze the Python version (as representative)
         python_code = code_outputs.get('python', '')
@@ -190,13 +190,12 @@ Format response as JSON:
   "learning_insights": ["insight 1", "insight 2"]
 }}"""
 
-        analysis_message = UserMessage(text=analysis_prompt)
-        response = await chat.send_message(analysis_message)
+        response = await asyncio.to_thread(model.generate_content, analysis_prompt)
         
         # Parse JSON response
         import json
         try:
-            return json.loads(response)
+            return json.loads(response.text)
         except:
             # Fallback if JSON parsing fails
             return {
@@ -352,6 +351,11 @@ async def get_session_history(session_id: str):
         logging.error(f"Error getting session history: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/coach")
+async def coach_endpoint(request: dict):
+    """Coach endpoint - alias for /chat"""
+    return await chat_about_code(request)
+
 @api_router.post("/chat")
 async def chat_about_code(request: dict):
     """Interactive chat about code analysis or results with adaptive responses"""
@@ -366,7 +370,7 @@ async def chat_about_code(request: dict):
         # Get user profile for personalized responses
         profile = await get_user_profile(session_id)
         
-        chat = await get_gemini_chat(session_id)
+        model = await get_gemini_model()
         
         # Build context-aware prompt with skill level adaptation
         context_prompt = ""
@@ -396,8 +400,8 @@ Instruction: {skill_instruction}
 
 Provide a helpful, conversational response adapted to their skill level. Be specific about the code when relevant. Keep responses concise but informative."""
 
-        chat_message = UserMessage(text=full_prompt)
-        response = await chat.send_message(chat_message)
+        response_obj = await asyncio.to_thread(model.generate_content, full_prompt)
+        response = response_obj.text
         
         # Update interaction history
         interaction = {
@@ -497,7 +501,7 @@ async def generate_personalized_suggestions(session_id: str, current_topic: str)
     """Generate personalized learning suggestions"""
     try:
         profile = await get_user_profile(session_id)
-        chat = await get_gemini_chat(session_id)
+        model = await get_gemini_model()
         
         suggestions_prompt = f"""Based on this user profile, generate 3 personalized learning suggestions for the topic "{current_topic}":
 
@@ -513,12 +517,11 @@ Generate suggestions that:
 
 Format as JSON array: ["suggestion 1", "suggestion 2", "suggestion 3"]"""
 
-        suggestion_message = UserMessage(text=suggestions_prompt)
-        response = await chat.send_message(suggestion_message)
+        response_obj = await asyncio.to_thread(model.generate_content, suggestions_prompt)
         
         try:
             import json
-            return json.loads(response)
+            return json.loads(response_obj.text)
         except:
             return [
                 f"Practice more {current_topic} problems",

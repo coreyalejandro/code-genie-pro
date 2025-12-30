@@ -1,45 +1,82 @@
-import fs from "node:fs";
-import path from "node:path";
-import archiver from "archiver";
-import { glob } from "glob";
+#!/usr/bin/env node
 
-const root = process.cwd();
-const version = fs
-  .readFileSync(path.join(root, "design-system/minimalist/VERSION.txt"), "utf8")
-  .trim();
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import archiver from 'archiver';
 
-const outDir = path.join(root, "public", "downloads");
-fs.mkdirSync(outDir, { recursive: true });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '..');
+const designExportDir = path.join(projectRoot, 'design-export');
+const distDir = path.join(projectRoot, 'dist');
+const outputZip = path.join(distDir, 'minimalist-design-kit.zip');
 
-const zipName = `minimalist-design-kit_v${version}.zip`;
-const outPath = path.join(outDir, zipName);
+// Ensure dist directory exists
+if (!fs.existsSync(distDir)) {
+  fs.mkdirSync(distDir, { recursive: true });
+}
 
-const output = fs.createWriteStream(outPath);
-const archive = archiver("zip", { zlib: { level: 9 } });
+// Files to include in the kit
+const filesToInclude = [
+  'tailwind.config.js',
+  'postcss.config.js',
+  'index.css',
+  'App.css',
+  'DESIGN_SYSTEM.md',
+  'COLORS.md',
+  'README.md',
+  'EXAMPLES.jsx',
+  'package-dependencies.json',
+  '.vscode/settings.json'
+];
 
-archive.on("error", (err) => {
-  throw err;
+console.log('📦 Building Minimalist Design Kit...\n');
+
+// Create zip archive
+const output = fs.createWriteStream(outputZip);
+const archive = archiver('zip', {
+  zlib: { level: 9 } // Maximum compression
+});
+
+output.on('close', () => {
+  const sizeInMB = (archive.pointer() / 1024 / 1024).toFixed(2);
+  console.log(`✅ Build complete!`);
+  console.log(`📦 Archive: ${outputZip}`);
+  console.log(`📊 Size: ${sizeInMB} MB`);
+  console.log(`\n✨ The minimalist design kit is ready to share!`);
+});
+
+archive.on('error', (err) => {
+  console.error('❌ Archive error:', err);
+  process.exit(1);
 });
 
 archive.pipe(output);
 
-const patterns = [
-  "design-system/minimalist/VERSION.txt",
-  "design-system/minimalist/docs/**/*",
-  "design-system/minimalist/kit/**/*",
-];
+// Add files to archive
+let filesAdded = 0;
+let filesSkipped = 0;
 
-for (const pattern of patterns) {
-  const matches = await glob(pattern, { cwd: root, nodir: false, dot: true });
-  for (const rel of matches) {
-    const abs = path.join(root, rel);
-    const stat = fs.statSync(abs);
-    if (stat.isFile()) {
-      archive.file(abs, { name: rel.replace("design-system/minimalist/", "") });
+filesToInclude.forEach((file) => {
+  const filePath = path.join(designExportDir, file);
+  
+  if (fs.existsSync(filePath)) {
+    const stats = fs.statSync(filePath);
+    if (stats.isFile()) {
+      archive.file(filePath, { name: file });
+      filesAdded++;
+      console.log(`  ✓ Added: ${file}`);
+    } else if (stats.isDirectory()) {
+      archive.directory(filePath, file);
+      filesAdded++;
+      console.log(`  ✓ Added directory: ${file}`);
     }
+  } else {
+    filesSkipped++;
+    console.log(`  ⚠ Skipped (not found): ${file}`);
   }
-}
+});
 
-await archive.finalize();
-
-console.log(`Wrote: ${path.relative(root, outPath)}`);
+// Finalize the archive
+archive.finalize();

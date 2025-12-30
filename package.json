@@ -1,7 +1,19 @@
 {
+  "scripts": {
+    "dev": "concurrently -n \"backend,frontend\" -c \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && python -m uvicorn server:app --reload --host 0.0.0.0 --port 8000",
+    "dev:frontend": "cd frontend && npm start",
+    "setup:backend": "node scripts/setup-backend.mjs",
+    "setup:frontend": "cd frontend && npm install",
+    "setup": "npm run setup:backend && npm run setup:frontend",
+    "ds:minimalist:build": "node scripts/build-minimalist-kit.mjs"
+  },
   "dependencies": {
     "archiver": "^7.0.1",
     "glob": "^13.0.0",
     "react-markdown": "^10.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
